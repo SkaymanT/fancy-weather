@@ -1,3 +1,2 @@
-# speakit
-
-### [speakit](https://skaymant-speakit.netlify.app)
+# Fancy-weather
+### [Fancy-weather](https://skaymant-fancy-weather.netlify.app)
