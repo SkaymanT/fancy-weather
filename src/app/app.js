@@ -1,38 +1,36 @@
 import '../style/style.scss';
+import Controls from './controls/controls.js';
+import Weather from './weather/weather.js';
+import Map from './map/map.js';
 
 
 window.onload = () => {
-  const page = new Page();
-  page.createPage();
+  const app = new App();
+  app.initApp();
 };
 
-class Page {
+class App {
   constructor() {
-    this.isMode = true;
-    this.numberCategory = 0;
-    this.trueWord = '';
-    this.arrayWordsForGame = [];
-    this.isWin = true;
-    this.numberErrors = 0;
+    this.controls = new Controls(this.doChangesFromControls.bind(this));
+    this.weather = new Weather();
+    this.map = new Map();
   }
 
-  createPage() {
+  initApp() {
+    this.initRoot();
+    this.root.append(this.controls.render());
+    this.root.append(this.weather.render());
+    this.root.append(this.map.render());
+  }
+
+  doChangesFromControls(){
+    console.log('Changes');
+  }
+
+  initRoot(){
     const body = document.querySelector('body');
     this.root = document.createElement('div');
     this.root.setAttribute('id', 'root');
-
-    this.appcontainer = document.createElement('div');
-    this.appcontainer.classList.add('app-container');
-
-    this.header = document.createElement('div');
-    this.header.classList.add('header-container');
-
-    this.container = document.createElement('div');
-    this.container.classList.add('container');
-
-    this.appcontainer.append(this.header);
-    this.appcontainer.append(this.container);
-    this.root.append(this.appcontainer);
     body.prepend(this.root);
   }
 
