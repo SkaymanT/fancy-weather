@@ -2,8 +2,24 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// const CopyWebpackPlugin= require('copy-webpack-plugin');
+const CopyWebpackPlugin= require('copy-webpack-plugin');
 
+const babelOptions = preset => {
+  const opts = {
+    presets: [
+      '@babel/preset-env'
+    ],
+    plugins: [
+      '@babel/plugin-proposal-class-properties'
+    ]
+  }
+
+  if (preset) {
+    opts.presets.push(preset);
+  }
+
+  return opts;
+}
 
 module.exports = (env, options) => {
   const isProduction = options.mode === 'production';
@@ -13,13 +29,15 @@ module.exports = (env, options) => {
     devtool: isProduction ? 'none' : 'source-map',
     watch: !isProduction,
     entry: {
-      app: './src/app/app.js',
+      app: './src/app/app.ts',
     },
     output: {
       filename: '[name].js',
       path: path.resolve(__dirname, 'dist')
     },
-
+    resolve: {
+      extensions: [".ts", ".tsx", ".js"]
+    },
     module: {
       rules: [{
           test: /\.m?js$/,
@@ -29,6 +47,14 @@ module.exports = (env, options) => {
             options: {
               presets: ['@babel/preset-env']
             }
+          }
+        },
+        {
+          test: /\.ts$/,
+          exclude: /node_modules/,
+          loader: {
+            loader: 'babel-loader',
+            options: babelOptions('@babel/preset-typescript')
           }
         },
         {
@@ -70,15 +96,11 @@ module.exports = (env, options) => {
       new HtmlWebpackPlugin({
         template: './src/index.html'
       }),
-      // new CopyWebpackPlugin([{
-      //   from: './src/assets/img',
-      //   to: './assets/img'
-      // },
-      // {
-      //   from: './src/assets/audio',
-      //   to: './assets/audio'
-      // },
-    // ]),
+      new CopyWebpackPlugin([{
+        from: './src/assets/img',
+        to: './assets/img'
+      },
+    ]),
       new MiniCssExtractPlugin({
         filename: 'style.css',
       }),

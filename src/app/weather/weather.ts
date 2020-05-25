@@ -1,5 +1,5 @@
-import WeatherToday from './weather-today';
-import WeatherDays from './weather-days';
+import WeatherToday from './weather-today.ts';
+import WeatherDays from './weather-days.ts';
 
 export default class Weather {
 
