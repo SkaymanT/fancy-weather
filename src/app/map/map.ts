@@ -1,5 +1,6 @@
 export default class Map {
 
+  mapContainer: any;
   constructor() {
   }
 
@@ -13,7 +14,7 @@ export default class Map {
     return this.mapContainer;
   }
 
-  handlerClick(event) {
+  handlerClick() {
     
   }
 

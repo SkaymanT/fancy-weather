@@ -1,9 +1,14 @@
-import WeatherToday from './weather-today.ts';
-import WeatherDays from './weather-days.ts';
+import WeatherToday from './weather-today';
+import WeatherDays from './weather-days';
 
 export default class Weather {
 
-  constructor(doChanges) {
+  weatherDays: WeatherDays;
+  weatherToday: WeatherToday;
+  doChanges: Function;
+  weatherContainer: any;
+
+  constructor(doChanges: Function) {
     this.weatherDays = new WeatherDays();
     this.weatherToday = new WeatherToday();
     this.doChanges = doChanges;
@@ -22,7 +27,7 @@ export default class Weather {
     return this.weatherContainer;
   }
 
-  handlerClick(event) {
+  handlerClick() {
     
   }
 

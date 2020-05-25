@@ -1,4 +1,4 @@
-#root {
+.app_wrapper {
   position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -14,8 +14,7 @@
   padding: 2%;
   background-color: #000;
   background-position: 50%;
-  background-size: cover;
-  background-image: url(/assets/img/bg2.png);
+  background-size: cover
 }
 
 .preloader {
@@ -25,7 +24,7 @@
   background-size: auto 30%
 }
 
-.button-base {
+.btn_base {
   position: relative;
   width: 44px;
   height: 44px;
@@ -47,7 +46,7 @@
   user-select: none
 }
 
-.button-base:before {
+.btn_base:before {
   content: "";
   position: absolute;
   top: -8px;
@@ -62,14 +61,14 @@
   transform: skewX(-45deg)
 }
 
-.button-base:hover:before {
+.btn_base:hover:before {
   left: 150px;
   -webkit-transition: .5s ease-in-out;
   -o-transition: .5s ease-in-out;
   transition: .5s ease-in-out
 }
 
-.droplist-base {
+.droplist_base {
   display: block;
   width: 71px;
   height: 44px;
@@ -89,11 +88,11 @@
   transition: .2s ease-in-out
 }
 
-.droplist-base:hover {
-  background-color: #343434;
+.droplist_base:hover {
+  background-color: green
 }
 
-.input-base {
+.input_base {
   -webkit-box-flex: 1;
   -ms-flex: 1 1;
   flex: 1 1;
@@ -109,35 +108,35 @@
   outline: none
 }
 
-.input-base::-webkit-input-placeholder {
+.input_base::-webkit-input-placeholder {
   color: #fff;
   text-indent: 0;
   -webkit-transition: text-indent .3s ease;
   transition: text-indent .3s ease
 }
 
-.input-base::-moz-placeholder {
+.input_base::-moz-placeholder {
   color: #fff;
   text-indent: 0;
   -moz-transition: text-indent .3s ease;
   transition: text-indent .3s ease
 }
 
-.input-base:-ms-input-placeholder {
+.input_base:-ms-input-placeholder {
   color: #fff;
   text-indent: 0;
   -ms-transition: text-indent .3s ease;
   transition: text-indent .3s ease
 }
 
-.input-base::-ms-input-placeholder {
+.input_base::-ms-input-placeholder {
   color: #fff;
   text-indent: 0;
   -ms-transition: text-indent .3s ease;
   transition: text-indent .3s ease
 }
 
-.input-base::placeholder {
+.input_base::placeholder {
   color: #fff;
   text-indent: 0;
   -webkit-transition: text-indent .3s ease;
@@ -145,31 +144,31 @@
   transition: text-indent .3s ease
 }
 
-.input-base:focus::-webkit-input-placeholder {
+.input_base:focus::-webkit-input-placeholder {
   text-indent: 500px
 }
 
-.input-base:focus::-moz-placeholder {
+.input_base:focus::-moz-placeholder {
   text-indent: 500px
 }
 
-.input-base:focus:-ms-input-placeholder {
+.input_base:focus:-ms-input-placeholder {
   text-indent: 500px
 }
 
-.input-base:focus::-ms-input-placeholder {
+.input_base:focus::-ms-input-placeholder {
   text-indent: 500px
 }
 
-.input-base:focus::placeholder {
+.input_base:focus::placeholder {
   text-indent: 500px
 }
 
-.input-base::-webkit-search-cancel-button {
+.input_base::-webkit-search-cancel-button {
   display: none
 }
 
-.controls-container {
+.controls_block {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -181,37 +180,37 @@
   width: 100%
 }
 
-.button-background {
+.controls_block--btn-bg {
   line-height: 54px;
   background-color: grey;
-  background-image: url(/assets/img/update-button.svg);
+  background-image: url(/assets/img/controls--btn.png);
   border: 1px solid #fff;
   border-radius: 5px
 }
 
-.button-background:hover,
-.button-background_active {
-  background-color: #343434;
+.controls_block--btn-bg:hover,
+.controls_block--btn-bg_active {
+  background-color: green
 }
 
-.button-temp-f {
+.controls_block--btn-temp_f {
   z-index: 1;
   height: 42px;
   border-radius: 5px 0 0 5px
 }
 
-.button-temp-f:hover {
-  background: #343434;
+.controls_block--btn-temp_f:hover {
+  background: green
 }
 
-.button-temp-c {
+.controls_block--btn-temp_c {
   z-index: 1;
   height: 42px;
   border-radius: 0 5px 5px 0
 }
 
-.button-temp-c:hover {
-  background: #343434;
+.controls_block--btn-temp_c:hover {
+  background: green
 }
 
 .controls_block--btn_icon_active {
@@ -284,7 +283,7 @@
   }
 }
 
-.button-micro {
+.btn_voice {
   position: relative;
   width: 44px;
   height: 44px;
@@ -304,8 +303,8 @@
   user-select: none
 }
 
-.button-micro:after,
-.button-micro:before {
+.btn_voice:after,
+.btn_voice:before {
   content: "";
   position: absolute;
   top: 50%;
@@ -339,7 +338,7 @@
 }
 
 .btn_voice-click>.btn_voice--voice_icon,
-.input-base:hover>.btn_voice--voice_icon {
+.btn_voice:hover>.btn_voice--voice_icon {
   -webkit-filter: invert(30%) sepia(99%) saturate(4077%) hue-rotate(105deg);
   filter: invert(30%) sepia(99%) saturate(4077%) hue-rotate(105deg)
 }
@@ -394,7 +393,7 @@
   }
 }
 
-.container{
+.wrapper {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -411,7 +410,7 @@
   background-color: rgba(0, 0, 0, .5)
 }
 
-.controls-btns-container {
+.wrapper-btns {
   -webkit-box-flex: 1;
   -ms-flex: 1 1;
   flex: 1 1;
@@ -420,7 +419,7 @@
   justify-content: flex-start
 }
 
-.button-droplist {
+.wrapper-droplist {
   position: relative;
   margin: 0 20px;
   overflow: hidden;
@@ -429,7 +428,7 @@
   transition: .2s ease-in-out
 }
 
-.button-droplist:before {
+.wrapper-droplist:before {
   content: "";
   position: absolute;
   top: -8px;
@@ -444,14 +443,14 @@
   transform: skewX(-45deg)
 }
 
-.button-droplist:hover:before {
+.wrapper-droplist:hover:before {
   left: 150px;
   -webkit-transition: .5s ease-in-out;
   -o-transition: .5s ease-in-out;
   transition: .5s ease-in-out
 }
 
-.button-radio {
+.wrapper-radio_btns {
   position: relative;
   height: 44px;
   margin: 0;
@@ -461,11 +460,11 @@
   perspective: 90px
 }
 
-.search-container {
+.wrapper-search {
   width: 39%
 }
 
-.radio-flap {
+.radio_btn--flap {
   position: absolute;
   top: -1;
   left: 50%;
@@ -486,20 +485,20 @@
   transition: transform .5s ease-out, -webkit-transform .5s ease-out
 }
 
-.radio-flap-check {
+.radio_btn--flap-check {
   -webkit-transform: rotateY(-180deg);
   transform: rotateY(-180deg)
 }
 
 @media (max-width:400px) {
-  .controls-btns-container {
+  .wrapper-btns {
     -ms-flex-pack: distribute;
     justify-content: space-around
   }
 }
 
 @media (max-width:1024px) {
-  .search-container {
+  .wrapper-search {
     width: 100%
   }
 }
@@ -565,7 +564,7 @@
   font-size: 1em
 }
 
-.weather-container {
+.weather--wrapper {
   -webkit-box-flex: 1;
   -ms-flex: 1 1 60%;
   flex: 1 1 60%
@@ -676,7 +675,7 @@
   border-radius: 25px
 }
 
-.map-container {
+.map_block {
   -webkit-box-flex: 1;
   -ms-flex: 1 1 39%;
   flex: 1 1 39%;
