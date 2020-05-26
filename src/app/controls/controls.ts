@@ -1,22 +1,28 @@
-import ControlsButtons from './controls-buttons';
+import RefreshButton from './refresh-button';
+import MenuLanguage from './menu-language';
+import TemperatureScale from './temperature-scale';
 import Search from './search';
 
 export default class Controls {
   search: Search;
-  controlsButtons: ControlsButtons;
+  refreshButton: RefreshButton;
+  menuLanguage: MenuLanguage;
+  temperatureScale: TemperatureScale;
   doChanges: Function;
-  controlsContainer: any;
+  controlsContainer: HTMLDivElement;
 
   constructor(doChanges: Function) {
     this.doChanges = doChanges;
     this.search = new Search(doChanges);
-    this.controlsButtons = new ControlsButtons(doChanges);
+    this.refreshButton = new RefreshButton(doChanges);
+    this.menuLanguage = new MenuLanguage(doChanges);
+    this.temperatureScale = new TemperatureScale(doChanges);
   }
 
-  render() {
+  public render(): HTMLDivElement {
     this.controlsContainer = document.createElement('div');
     this.controlsContainer.classList.add('controls-container');
-    this.controlsContainer.append(this.controlsButtons.render());
+    this.controlsContainer.append(this.getControlsButtons());
     this.controlsContainer.append(this.search.render());
 
     // this.controlsContainer.addEventListener('click', (event) => this.handlerClick(event));
@@ -25,9 +31,19 @@ export default class Controls {
     return this.controlsContainer;
   }
 
-  handlerClick(event) {
-    
+  handlerClick() {
+
   }
 
- 
+  private getControlsButtons(): HTMLDivElement {
+    const main = document.createElement('div');
+    main.classList.add('controls-btns-container');
+    main.append(this.refreshButton.render());
+    main.append(this.menuLanguage.render());
+    main.append(this.temperatureScale.render());
+    return main;
+  }
+
+
+
 }

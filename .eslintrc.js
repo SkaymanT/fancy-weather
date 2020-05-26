@@ -28,6 +28,13 @@ module.exports = {
     ],
     "rules": {
         "no-unused-vars": "warn",
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/require-await": "error",
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-dupe-class-members": "error",
+        "@typescript-eslint/unbound-method": "error",
+        "@typescript-eslint/no-unsafe-return": "error",
+        "@typescript-eslint/no-non-null-assertion": "error",
         "@typescript-eslint/rule-name": "error",
         "@typescript-eslint/ban-ts-comment": "error",
         "@typescript-eslint/class-literal-property-style": "error",

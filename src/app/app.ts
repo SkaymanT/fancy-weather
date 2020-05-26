@@ -1,7 +1,7 @@
 import '../style/style.scss';
 import Controls from './controls/controls';
-import Weather from './weather/weather';
-import Map from './map/map';
+import Weather from './main/weather';
+import Map from './main/map';
 
 
 window.onload = () => {
@@ -20,24 +20,30 @@ class App {
     this.map = new Map();
   }
 
-  initApp() {
-    const popover = document.createElement("div");
-    console.log('object :>> ', popover);
+  public initApp() {
     this.initRoot();
     this.root.append(this.controls.render());
-    this.root.append(this.weather.render());
-    this.root.append(this.map.render());
+    this.root.append(this.getMain());
   }
 
-  doChangesFromControls() {
+  public doChangesFromControls() {
     console.log('Changes');
   }
 
-  initRoot() {
+  private initRoot(): void {
     const body = document.querySelector('body')!;
     this.root = document.createElement('div');
     this.root.setAttribute('id', 'root');
     body.prepend(this.root);
   }
+
+  private getMain(): HTMLDivElement {
+    const main = document.createElement('div');
+    main.classList.add('main-container');
+    main.append(this.weather.render());
+    main.append(this.map.render());
+    return main;
+  }
+
 
 }
