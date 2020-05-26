@@ -3,9 +3,16 @@ module.exports = {
     "env": {
         "browser": true,
         "node": true,
-        "es6": true
+        "es6": true,
+        "jest": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "airbnb-typescript",
+        "airbnb/hooks",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    ],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
@@ -18,8 +25,13 @@ module.exports = {
     },
     "plugins": [
         "@typescript-eslint/eslint-plugin"
-      ],
+    ],
     "rules": {
-        "no-unused-vars": "warn"
+        "no-unused-vars": "warn",
+        "@typescript-eslint/rule-name": "error",
+        "@typescript-eslint/ban-ts-comment": "error",
+        "@typescript-eslint/class-literal-property-style": "error",
+        "@typescript-eslint/explicit-function-return-type": "error",
+        "@@typescript-eslint/explicit-member-accessibility": "error",
     }
 };

@@ -20,7 +20,7 @@ export default class ControlsButtons {
     return this.controlsButtons;
   }
 
-  handlerClick(event) {
+  handlerClick() {
     // if (this.isClickButtonСlear(event)) {
     //   this.clickButtonСlear();
     // }

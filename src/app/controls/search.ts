@@ -1,4 +1,3 @@
-
 export default class Search {
   doChanges: Function;
   searchContainer: any;
@@ -19,24 +18,24 @@ export default class Search {
     return this.searchContainer;
   }
 
-  handlerClick(event) {
+  handlerClick() {
     // if (this.isClickButtonСlear(event)) {
     //   this.clickButtonСlear();
     // }
   }
 
-  private initInput(){
+  private initInput() {
     const inputContainer = document.createElement('input');
     inputContainer.classList.add('input-base');
     inputContainer.setAttribute('type', 'search');
     return inputContainer;
   }
 
-  private initMicro(){
+  private initMicro() {
     const buttonMicro = document.createElement('div');
     buttonMicro.classList.add('button-micro');
     return buttonMicro;
   }
 
- 
+
 }
