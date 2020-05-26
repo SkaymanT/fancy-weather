@@ -440,14 +440,14 @@ body {
   height: 6.7rem
 }
 
-.map-cluster__map {
+.map-container__map {
   width: 37.5rem;
   height: 37.5rem;
   border-radius: 5%;
   overflow: hidden
 }
 
-.map-cluster__coordinates {
+.map-container__coordinates {
   margin-top: 2rem;
   font-size: 2.2rem;
   text-align: right
@@ -567,7 +567,7 @@ body {
     margin-top: 10rem
   }
 
-  .map-cluster__coordinates {
+  .map-container__coordinates {
     text-align: center;
     margin-bottom: 4rem
   }

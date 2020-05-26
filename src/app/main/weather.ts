@@ -11,7 +11,7 @@ export default class Weather {
     this.weatherContainer = document.createElement('div');
     this.weatherContainer.classList.add('weather-container');
     this.initWeatherToday();
-    this.getWeatherDays();
+    this.initWeatherDays();
 
     // this.weatherContainer.addEventListener('click', (event) => this.handlerClick(event));
     // document.addEventListener('keydown', (e) => this.handlerClickKeyboard(e));
@@ -63,9 +63,40 @@ export default class Weather {
     this.weatherContainer.append(weatherData);
   }
 
-  private getWeatherDays(): void {
-    const buttonMicro = document.createElement('button');
-    buttonMicro.classList.add('button-micro');
+  private initWeatherDays(): void {
+
+    interface IForecast {
+      day: string;
+      temperature: string;
+      icon: string;
+    }
+
+    const list: Array<IForecast> = [{ day: 'Wednesday', temperature: '14', icon: 'https://fancy-weather-lhk.surge.sh/img/partly-cloudy-day.png' }, { day: 'Wednesday', temperature: '14', icon: 'https://fancy-weather-lhk.surge.sh/img/partly-cloudy-day.png' }, { day: 'Wednesday', temperature: '14', icon: 'https://fancy-weather-lhk.surge.sh/img/partly-cloudy-day.png' }];
+    list.forEach(element => {
+      const forecast = document.createElement('div');
+      forecast.classList.add('forecast');
+      for (const key in element) {
+        if (key === 'icon') {
+          const weatherData1 = document.createElement('img');
+          weatherData1.classList.add(`forecast__${key}`);
+          weatherData1.src = element[key];
+          forecast.append(weatherData1);
+        } if (key === 'temperature') {
+          const weatherData1 = document.createElement('p');
+          weatherData1.classList.add(`forecast__${key}`);
+          weatherData1.innerText = element[key];
+          forecast.append(weatherData1);
+        }
+        if (key === 'day') {
+          const weatherData1 = document.createElement('p');
+          weatherData1.classList.add(`forecast__${key}`);
+          weatherData1.innerText = element[key];
+          forecast.append(weatherData1);
+        }
+      }
+
+      this.weatherContainer.append(forecast);
+    });
   }
 
 
