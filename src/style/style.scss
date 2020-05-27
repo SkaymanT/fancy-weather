@@ -187,14 +187,9 @@ body {
     transform: rotate(0)
   }
 
-  80% {
-    -webkit-transform: rotate(400deg);
-    transform: rotate(400deg)
-  }
-
   to {
-    -webkit-transform: rotate(1turn);
-    transform: rotate(1turn)
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg)
   }
 }
 
@@ -202,8 +197,11 @@ body {
   width: 2rem;
   height: 2rem;
   background: url(../assets/img/spinner.svg) 50% no-repeat;
-  -webkit-animation: spin 1.4s ease-in-out;
-  animation: spin 1.4s ease-in-out
+}
+
+.spinner-refresh {
+  -webkit-animation: spin 1.5s linear infinite;
+  animation: spin 1.5s linear infinite
 }
 
 .menu-language {
@@ -338,8 +336,13 @@ body {
   right: 10.5rem;
   width: 3rem;
   height: 4rem;
+  opacity: .8;
   background: url(../assets/img/microphone.svg) 50% no-repeat;
   background-size: 50%
+}
+
+.button-micro.active {
+  opacity: 1;
 }
 
 .inactive {

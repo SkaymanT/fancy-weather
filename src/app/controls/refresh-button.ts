@@ -13,14 +13,12 @@ export default class RefreshButton {
     const spinnerButton = document.createElement('div');
     spinnerButton.classList.add('spinner');
     this.refreshButton.append(spinnerButton);
-
     this.refreshButton.addEventListener('click', (event) => this.handlerClick(event));
-    // document.addEventListener('keydown', (e) => this.handlerClickKeyboard(e));
 
     return this.refreshButton;
   }
 
-  private handlerClick(event) {
+  private handlerClick(event): void {
     if (this.isClickButtonRefresh(event)) {
       this.clickButtonRefresh(event);
     }
@@ -30,18 +28,11 @@ export default class RefreshButton {
     return event.target.classList.contains('spinner') || event.target.classList.contains('button-refresh');
   }
 
-  private clickButtonRefresh(event): void {
-    console.log(event.target);
+  async clickButtonRefresh(event): Promise<string> {
+    this.refreshButton.querySelector('.spinner').classList.add('spinner-refresh');
     console.log(document.querySelector('.spinner'));
-    this.refreshButton.querySelector('.spinner').animate([
-      // keyframes
-      { transform: 'translate3D(0, 0, 0)' },
-      { transform: 'translate3D(0, -300px, 0)' }
-    ], {
-      // timing options
-      duration: 1000,
-      iterations: Infinity
-    });
-    console.log('sss');
+    await this.doChanges();
+    this.refreshButton.querySelector('.spinner').classList.remove('spinner-refresh');
+    return 'end';
   }
 }

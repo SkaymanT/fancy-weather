@@ -8,15 +8,13 @@ export default class Controls {
   refreshButton: RefreshButton;
   menuLanguage: MenuLanguage;
   temperatureScale: TemperatureScale;
-  doChanges: Function;
   controlsContainer: HTMLDivElement;
 
-  constructor(doChanges: Function) {
-    this.doChanges = doChanges;
+  constructor(doChanges: Function, doChangeBackground: Function, doChangeLanguage: Function, doChangeScale: Function) {
     this.search = new Search(doChanges);
-    this.refreshButton = new RefreshButton(doChanges);
-    this.menuLanguage = new MenuLanguage(doChanges);
-    this.temperatureScale = new TemperatureScale(doChanges);
+    this.refreshButton = new RefreshButton(doChangeBackground);
+    this.menuLanguage = new MenuLanguage(doChangeLanguage);
+    this.temperatureScale = new TemperatureScale(doChangeScale);
   }
 
   public render(): HTMLDivElement {
@@ -25,14 +23,7 @@ export default class Controls {
     this.controlsContainer.append(this.getControlsButtons());
     this.controlsContainer.append(this.search.render());
 
-    // this.controlsContainer.addEventListener('click', (event) => this.handlerClick(event));
-    // document.addEventListener('keydown', (e) => this.handlerClickKeyboard(e));
-
     return this.controlsContainer;
-  }
-
-  handlerClick() {
-
   }
 
   private getControlsButtons(): HTMLDivElement {
@@ -43,7 +34,5 @@ export default class Controls {
     main.append(this.temperatureScale.render());
     return main;
   }
-
-
 
 }
