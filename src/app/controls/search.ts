@@ -45,10 +45,45 @@ export default class Search {
   }
 
   private validationInput(input): boolean {
-    if (input == '') {
+    let regEnglish = /[A-Za-z0-9]/i;
+    let regRusBel = /[А-Яа-я0-9]/i;
+    let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
+    if (localStorage.language === '"en"' || localStorage.language === undefined) {
+      if (regRusBel.test(input)) {
+        inputElement.placeholder = 'Please enter the correct city';
+        inputElement.value = '';
+      }
+      if (input == '') {
+        inputElement.placeholder = 'Please enter a city';
+        return;
+      }
       return;
     }
-    return;
+    if (localStorage.language === '"ru"') {
+      if (regEnglish.test(input)) {
+        inputElement.placeholder = 'Введите корректный город';
+        inputElement.value = '';
+      }
+      if (input == '') {
+        inputElement.placeholder = 'Пожалуйста введите город';
+        inputElement.value = '';
+        return;
+      }
+      return;
+    }
+
+    if (localStorage.language === '"be"') {
+      if (regEnglish.test(input)) {
+        inputElement.placeholder = 'Упішыце горад';
+        inputElement.value = '';
+      }
+      if (input == '') {
+        inputElement.placeholder = 'Упішыце верны горад';
+        inputElement.value = '';
+        return;
+      }
+      return;
+    }
   }
 
   private isClickButtonMicro(event): boolean {
