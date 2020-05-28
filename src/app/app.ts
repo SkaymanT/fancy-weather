@@ -24,6 +24,7 @@ class App {
   KEYWEATHER: string;
   KEYGEOlOCATION: string;
   KEYGEOCORDING: string;
+  KEYMAPAPI: string;
   LAT: string;
   LON: string;
   constructor() {
@@ -31,11 +32,12 @@ class App {
     this.weather = new Weather(this.doChangesFromControls.bind(this));
     this.map = new Map();
     this.KEYIMAGEAPI = 'GZ3T-OqnbT6kW0m8CccKw-ucz4MaeTsJ29r2rKflNoQ';
-    this.KEYWEATHER = 'XJ3A3JAb13JN8sO3MA1vDgyMAXrZJLwb';
+    this.KEYWEATHER = '324abe064a5d4a98a54f513199af142b';
     this.KEYGEOlOCATION = 'f7edfcc5ad81b0';
     this.KEYGEOCORDING = '57913d93c3a94107bcf4c29eb5f997c7';
     this.LAT = '55.752';
     this.LON = '37.6156';
+    this.KEYMAPAPI = 'AIzaSyBcBdvaJ9lvN0GrEy8Rl8FniJ521aokVMM';
   }
 
 
@@ -48,15 +50,16 @@ class App {
   }
 
   public async doChangesFromControls(text): Promise<void> {
-    await this.doChangesWeather(text);
-    await this.doChangesWeather(text);
-    await this.doChangesWeather(text);
+    await this.doChangesWeather('Minsk');
+    await this.doChangesGeocording(text);
+    // await this.doChangesGeocording(text);
     console.log('Changes ', text);
   }
 
 
   public async doChangesGeocording(text: string): Promise<void> {
-    const url = `https://api.opencagedata.com/geocode/v1/json?q=Minsk&key=${this.KEYGEOCORDING}&pretty=1&no_annotations=1`;
+    const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=Moscow&country=RU&days=3&units=S&lang=be&key=619b6dd131094859b162bb2577321b2a`;
+    // const url = `https://api.opencagedata.com/geocode/v1/json?q=Minsk&key=${this.KEYGEOCORDING}&pretty=1&no_annotations=1`;
     try {
       const res = await fetch(url);
       const data = await res.json();
@@ -81,18 +84,31 @@ class App {
     console.log('Changes ', text);
   }
 
-
-  private async doChangesWeather(text: string): Promise<void> {
-    const url = `https://api.climacell.co/v3/weather/forecast/daily?lat=${this.LAT}&lon=${this.LON}&unit_system=si&start_time=now&fields=feels_like%2Ctemp%2Chumidity%2Cwind_speed%2Cweather_code&apikey=${this.KEYWEATHER}`;
+  public async doChangesMap(text: string): Promise<void> {
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=Minsk&key=${this.KEYGEOCORDING}&pretty=1&no_annotations=1`;
     try {
       const res = await fetch(url);
       const data = await res.json();
       console.log(data);
-      await this.addImageProcess(data.urls.full);
+
     } catch (error) {
       document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg1.png);`;
     }
     console.log('Changes ', text);
+  }
+
+  private async doChangesWeather(city: string): Promise<void> {
+    const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&days=4&units=S&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYWEATHER}`;
+    // const url = `https://api.openweathermap.org/data/2.5/forecast?q=${'Kiev'}&lang=${localStorage.language.substr(1, 2)}&units=metric&APPID=${this.KEYWEATHER}`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log(data);
+
+    } catch (error) {
+      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg1.png);`;
+    }
+    console.log('Changes ', city);
   }
 
 
@@ -149,7 +165,7 @@ class App {
   private getMain(): HTMLDivElement {
     const main = document.createElement('div');
     main.classList.add('main-container');
-    main.append(this.weather.render());
+    main.append(this.weather.render('Minsk', '', ''));
     main.append(this.map.render());
     return main;
   }
