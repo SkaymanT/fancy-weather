@@ -28,10 +28,11 @@ export default class MenuLanguage {
     menuDropDown.classList.add('drop-down-menu');
     this.list.forEach(element => {
       const buttonOption = document.createElement('button');
-
       buttonOption.classList.add('drop-down-menu__item');
       buttonOption.classList.add('button');
-      buttonOption.classList.add('inactive');
+      if (localStorage.language.substr(1, 2) !== element) {
+        buttonOption.classList.add('inactive');
+      }
       buttonOption.id = element;
       buttonOption.innerText = element;
       menuDropDown.append(buttonOption);

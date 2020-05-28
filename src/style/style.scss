@@ -1,3 +1,5 @@
+@import './preloader.scss';
+
 *,
 :after,
 :before {
@@ -77,13 +79,14 @@ body {
   position: relative;
   width: 100wh;
   height: 100vh;
-  background: -webkit-gradient(linear, left top, left bottom, from(rgba(8, 15, 26, .59)), to(rgba(17, 17, 46, .46))) 50% fixed, url(../assets/img/bg1.png) no-repeat 50% fixed;
-  background: linear-gradient(180deg, rgba(8, 15, 26, .59), rgba(17, 17, 46, .46)) 50% fixed, url(../assets/img/bg2.png) no-repeat 50% fixed;
+  background: -webkit-gradient(linear, left top, left bottom, from(rgba(8, 15, 26, .59)), to(rgba(17, 17, 46, .46))) 50% fixed, no-repeat 50% fixed;
+  background: linear-gradient(180deg, rgba(8, 15, 26, .59), rgba(17, 17, 46, .46)) 50% fixed, no-repeat 50% fixed;
   background-size: cover;
   padding-top: 1px;
   margin-top: -1px;
-  -webkit-animation: smoothAppearance 2s ease-in-out;
-  animation: smoothAppearance 2s ease-in-out
+  -webkit-animation: smoothAppearance 1s ease-in-out;
+  animation: smoothAppearance 1s ease-in-out;
+  transition: background-image 1s ease-in-out;
 }
 
 .controls-container {

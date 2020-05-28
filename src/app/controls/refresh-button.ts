@@ -30,7 +30,6 @@ export default class RefreshButton {
 
   async clickButtonRefresh(event): Promise<string> {
     this.refreshButton.querySelector('.spinner').classList.add('spinner-refresh');
-    console.log(document.querySelector('.spinner'));
     await this.doChanges();
     this.refreshButton.querySelector('.spinner').classList.remove('spinner-refresh');
     return 'end';

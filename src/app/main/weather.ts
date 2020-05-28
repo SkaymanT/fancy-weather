@@ -7,20 +7,51 @@ export default class Weather {
     this.doChanges = doChanges;
   }
 
-  public render(): HTMLDivElement {
+  public render(city: string, text1: string, text2: string): HTMLDivElement {
     this.weatherContainer = document.createElement('div');
     this.weatherContainer.classList.add('weather-container');
     this.initWeatherToday();
     this.initWeatherDays();
 
-    // this.weatherContainer.addEventListener('click', (event) => this.handlerClick(event));
-    // document.addEventListener('keydown', (e) => this.handlerClickKeyboard(e));
-
     return this.weatherContainer;
   }
 
-  handlerClick() {
+  public changedWeather(city: string, text1: string, text2: string): void {
 
+    this.weatherContainer.querySelector('.weather-container__location').innerHTML = city;
+
+
+    const dateTime = document.createElement('p');
+    dateTime.classList.add('weather-container__date-time');
+    dateTime.innerText = 'Tue 26 May 14:31';
+    this.weatherContainer.append(dateTime);
+
+    const temperatureToday = document.createElement('p');
+    temperatureToday.classList.add('weather-container__temperature-today');
+    temperatureToday.innerText = '18';
+    this.weatherContainer.append(temperatureToday);
+
+    const weatherIcon = document.createElement('img');
+    weatherIcon.classList.add('weather-container__weather-icon');
+    weatherIcon.alt = 'clear-day';
+    weatherIcon.src = 'https://fancy-weather-lhk.surge.sh/img/clear-day.png';
+    this.weatherContainer.append(weatherIcon);
+
+    const weatherData = document.createElement('div');
+    weatherData.classList.add('weather-container__weather-data');
+    const weatherData1 = document.createElement('p');
+    weatherData1.innerText = 'Clear';
+    weatherData.append(weatherData1);
+    const weatherData2 = document.createElement('p');
+    weatherData2.innerText = 'Feels Like: 18°';
+    weatherData.append(weatherData2);
+    const weatherData3 = document.createElement('p');
+    weatherData3.innerText = 'Wind: 4 m/s';
+    weatherData.append(weatherData3);
+    const weatherData4 = document.createElement('p');
+    weatherData4.innerText = 'Humidity: 49%';
+    weatherData.append(weatherData4);
+    this.weatherContainer.append(weatherData);
   }
 
   private initWeatherToday(): void {
