@@ -43,7 +43,7 @@ class App {
   KEYGEOCORDING: string;
   KEYMAPAPI: string;
   LAT: string;
-  LON: string;
+  LNG: string;
   constructor() {
     this.controls = new Controls(this.doChangesFromControls.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this));
     this.weather = new Weather(this.doChangesFromControls.bind(this));
@@ -54,9 +54,8 @@ class App {
     this.KEYGEOlOCATION = 'f7edfcc5ad81b0';
     this.KEYGEOCORDING = '57913d93c3a94107bcf4c29eb5f997c7';
     this.LAT = '55.752';
-    this.LON = '37.6156';
+    this.LNG = '37.6156';
     this.KEYMAPAPI = 'AIzaSyBcBdvaJ9lvN0GrEy8Rl8FniJ521aokVMM';
-    // https://www.weatherbit.io/static/img/icons/r01d.png
   }
 
 
@@ -80,8 +79,8 @@ class App {
     const main = document.createElement('div');
     main.classList.add('main-container');
     const forecast: CityForecast[] = [];
-    const urlCurrent = `https://api.weatherbit.io/v2.0/current?city=${city}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
-    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
+    const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
+    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
     try {
       const resCurrent = await fetch(urlCurrent);
       const dataCurrent = await resCurrent.json();
@@ -97,7 +96,7 @@ class App {
       });
       console.log(forecast);
       main.append(this.weather.render(currentWeather, forecast, city));
-      main.append(this.map.render(city));
+      main.append(await this.map.render(this.LAT, this.LNG));
     } catch (error) {
       console.log('Error', error);
     }
@@ -280,12 +279,16 @@ class App {
   }
 
   private async getGeolocation(): Promise<string> {
-    const url = `https://ipinfo.io/json?token=${this.KEYGEOlOCATION}`;
+    const urlLocation = `https://ipinfo.io/json?token=${this.KEYGEOlOCATION}`;
     let city = '';
     try {
-      const res = await fetch(url);
-      const data = await res.json();
-      city = data.city + ', ' + data.country;
+      const resLocation = await fetch(urlLocation);
+      const dataLocation = await resLocation.json();
+      const urlGeocoding = `https://api.opencagedata.com/geocode/v1/json?q=${dataLocation.city}%20${dataLocation.country}&key=${this.KEYGEOCORDING}&pretty=1&no_annotations=1&language=${localStorage.language.substr(1, 2)}`;
+      const resGeocoding = await fetch(urlGeocoding);
+      const dataGeocoding = await resGeocoding.json();
+      city = dataGeocoding.results[0].formatted;
+      [this.LAT, this.LNG] = [dataGeocoding.results[0].geometry.lat, dataGeocoding.results[0].geometry.lng];
     } catch (error) {
       console.log('Error', error);
     }
