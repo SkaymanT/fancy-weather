@@ -4,7 +4,7 @@ export default class Map {
   constructor() {
   }
 
-  public render(): HTMLDivElement {
+  public render(city: string): HTMLDivElement {
     this.mapContainer = document.createElement('div');
     this.mapContainer.classList.add('map-container');
     this.mapContainer.append(this.getMap());
