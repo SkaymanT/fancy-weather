@@ -3,21 +3,42 @@ export default class Search {
   doChanges: Function;
   searchContainer: HTMLDivElement;
   micro: Micro;
+  placeholder: string;
+  errorText: string;
+  incorrectText: string;
+  nameButton: string;
 
   constructor(doChanges: Function) {
     this.doChanges = doChanges;
     this.micro = new Micro(doChanges);
   }
 
-  public render(): HTMLDivElement {
+  public render(text: Array<string>): HTMLDivElement {
     this.searchContainer = document.createElement('div');
     this.searchContainer.classList.add('search-container');
+    this.changeText(text);
     this.searchContainer.append(this.getInput());
     this.searchContainer.append(this.micro.getMicro());
     this.searchContainer.append(this.getSearch());
     this.searchContainer.addEventListener('click', (event) => this.handlerClick(event));
-
+    this.searchContainer.addEventListener('keydown', (e) => this.handlerClickKeyboard(e));
     return this.searchContainer;
+  }
+
+
+  public changedSearch(text: Array<string>): void {
+    this.changeText(text);
+    let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
+    let button = this.searchContainer.querySelector('.search-input__button') as HTMLInputElement;
+    inputElement.placeholder = this.placeholder;
+    button.innerText = this.nameButton;
+  }
+
+  private changeText(text: Array<string>): void {
+    this.errorText = text[0];
+    this.incorrectText = text[1];
+    this.placeholder = text[2];
+    this.nameButton = text[3];
   }
 
   private handlerClick(event): void {
@@ -28,6 +49,16 @@ export default class Search {
     if (this.isClickButtonSearch(event)) {
       this.clickButtonSearch();
     }
+  }
+
+  private handlerClickKeyboard(event): void {
+    if (this.isClickEnterSearch(event)) {
+      this.clickButtonSearch();
+    }
+  }
+
+  isClickEnterSearch(event) {
+    return event.keyCode === 13;
   }
 
   private isClickButtonSearch(event): boolean {
@@ -45,45 +76,19 @@ export default class Search {
   }
 
   private validationInput(input): boolean {
-    let regEnglish = /[A-Za-z0-9]/i;
-    let regRusBel = /[А-Яа-я0-9]/i;
+    let regLang = /[0-9 ]/i;
     let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
-    if (localStorage.language === '"en"' || localStorage.language === undefined) {
-      if (regRusBel.test(input)) {
-        inputElement.placeholder = 'Please enter the correct city';
-        inputElement.value = '';
-      }
-      if (input == '') {
-        inputElement.placeholder = 'Please enter a city';
-        return;
-      }
+    if (input == '') {
+      inputElement.placeholder = this.incorrectText;
       return;
     }
-    if (localStorage.language === '"ru"') {
-      if (regEnglish.test(input)) {
-        inputElement.placeholder = 'Введите корректный город';
-        inputElement.value = '';
-      }
-      if (input == '') {
-        inputElement.placeholder = 'Пожалуйста введите город';
-        inputElement.value = '';
-        return;
-      }
+    if (regLang.test(input)) {
+      inputElement.placeholder = this.errorText;
+      inputElement.value = '';
+    } else {
       return;
     }
-
-    if (localStorage.language === '"be"') {
-      if (regEnglish.test(input)) {
-        inputElement.placeholder = 'Упішыце горад';
-        inputElement.value = '';
-      }
-      if (input == '') {
-        inputElement.placeholder = 'Упішыце верны горад';
-        inputElement.value = '';
-        return;
-      }
-      return;
-    }
+    return;
   }
 
   private isClickButtonMicro(event): boolean {
@@ -103,7 +108,7 @@ export default class Search {
     inputContainer.classList.add('search-input');
     inputContainer.type = 'search';
     inputContainer.name = 'search-city';
-    inputContainer.placeholder = "Search city or ZIP";
+    inputContainer.placeholder = this.placeholder;
     inputContainer.required = true;
     return inputContainer;
   }
@@ -112,7 +117,7 @@ export default class Search {
     const buttonMicro = document.createElement('button');
     buttonMicro.classList.add('button');
     buttonMicro.classList.add('search-input__button');
-    buttonMicro.innerText = 'Search';
+    buttonMicro.innerText = this.nameButton;
     return buttonMicro;
   }
 

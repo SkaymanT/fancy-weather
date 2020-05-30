@@ -1,3 +1,5 @@
+import { getDate } from '../component/week';
+
 interface CityForecast {
   temp: string,
   icon: string,
@@ -31,11 +33,17 @@ export default class Weather {
     return this.weatherContainer;
   }
 
+  public refreshTime(): void {
+    if (localStorage.timezone) {
+      document.querySelector('.weather-container__date-time').innerHTML = getDate(localStorage.timezone.substring(1, localStorage.timezone.length - 1));
+    } else {
+      document.querySelector('.weather-container__date-time').innerHTML = getDate('Europe/Minsk');
+    }
+  }
+
   public doChangedWeather(days: Array<CityForecast>, city: string): void {
 
     this.weatherContainer.querySelector('.weather-container__location').innerHTML = city;
-
-
     const dateTime = document.createElement('p');
     dateTime.classList.add('weather-container__date-time');
     dateTime.innerText = 'Tue 26 May 14:31';

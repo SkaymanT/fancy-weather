@@ -17,11 +17,11 @@ export default class Controls {
     this.temperatureScale = new TemperatureScale(doChangeScale);
   }
 
-  public render(): HTMLDivElement {
+  public render(text: Array<string>): HTMLDivElement {
     this.controlsContainer = document.createElement('div');
     this.controlsContainer.classList.add('controls-container');
     this.controlsContainer.append(this.getControlsButtons());
-    this.controlsContainer.append(this.search.render());
+    this.controlsContainer.append(this.search.render(text));
 
     return this.controlsContainer;
   }

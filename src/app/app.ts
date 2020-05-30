@@ -3,12 +3,15 @@ import Controls from './controls/controls';
 import Weather from './main/weather';
 import Map from './main/map';
 import { getLoader } from './component/loader';
+import { getDate, getWeekDays } from './component/week';
 
 
 window.onload = () => {
   const app = new App();
   app.initApp();
+  window.setInterval(app.weather.refreshTime, 1000);
 };
+
 interface OnLoadAble {
   onload: any;
   onerror: any;
@@ -44,6 +47,10 @@ class App {
   KEYMAPAPI: string;
   LAT: string;
   LNG: string;
+  timezone: string;
+  textLangEn: Array<string>;
+  textLangRu: Array<string>;
+  textLangBe: Array<string>;
   constructor() {
     this.controls = new Controls(this.doChangesFromControls.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this));
     this.weather = new Weather(this.doChangesFromControls.bind(this));
@@ -56,16 +63,38 @@ class App {
     this.LAT = '55.752';
     this.LNG = '37.6156';
     this.KEYMAPAPI = 'AIzaSyBcBdvaJ9lvN0GrEy8Rl8FniJ521aokVMM';
+    this.timezone = '';
+    this.textLangEn = ['Incorrect city', 'Please enter a city', 'Search city', 'Search'];
+    this.textLangBe = ['Incorrect city', 'Please enter a city', 'Search city', 'Search'];
+    this.textLangRu = ['Incorrect city', 'Please enter a city', 'Search city', 'Search'];
   }
 
 
   public async initApp(): Promise<void> {
     this.initPreloader();
     this.initRoot();
-    this.root.append(this.controls.render());
+    this.initControls();
+    this.root.append(this.controls.render(this.textLangEn));
     const city = await this.getGeolocation();
     this.root.append(await this.getMain(city));
     this.spinnerOff();
+  }
+
+  private initControls(): void {
+    switch (localStorage.language.substr(1, 2)) {
+      case 'be': {
+        this.root.append(this.controls.render(this.textLangBe));
+        break;
+      }
+      case 'ru': {
+        this.root.append(this.controls.render(this.textLangRu));
+        break;
+      }
+      default: {
+        this.root.append(this.controls.render(this.textLangEn));
+        break;
+      }
+    }
   }
 
   public async doChangesFromControls(textCity): Promise<void> {
@@ -75,6 +104,16 @@ class App {
     console.log('Changes ', textCity);
   }
 
+  public doChangeLanguage(): void {
+    console.log('Changes doChangeLanguage');
+    const textLang = ['sss1', 'sss2', 'sss3', 'sss3'];
+    this.controls.search.changedSearch(textLang);
+  }
+
+  public doChangeScale(): void {
+    console.log('Changes doChangeScale');
+  }
+
   private async getMain(city: string): Promise<HTMLDivElement> {
     const main = document.createElement('div');
     main.classList.add('main-container');
@@ -82,21 +121,17 @@ class App {
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
     const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
     try {
-      const resCurrent = await fetch(urlCurrent);
-      const dataCurrent = await resCurrent.json();
-      const res = await fetch(urlForecast);
-      const data = await res.json();
-      console.log(dataCurrent.data[0]);
-      const currentWeather = this.getInfoCurrent(dataCurrent.data[0]);
-      console.log(currentWeather);
-      data.data.forEach((element, index) => {
+      let requests = [fetch(urlCurrent), fetch(urlForecast)];
+      const responses = await Promise.all(requests);
+      const data = await Promise.all(responses.map(r => r.json()));
+      const days = getWeekDays(data[1].timezone);
+      data[1].data.forEach((element, index) => {
         if (index !== 0) {
-          forecast.push(this.getInfoForecast(element));
+          forecast.push(this.getInfoForecast(days[index - 1], element));
         }
       });
-      console.log(forecast);
-      main.append(this.weather.render(currentWeather, forecast, city));
-      main.append(await this.map.render(this.LAT, this.LNG));
+      main.append(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, city));
+      main.append(await this.map.render(this.LAT, this.LNG, localStorage.language.substr(1, 2)));
     } catch (error) {
       console.log('Error', error);
     }
@@ -113,7 +148,7 @@ class App {
       const res = await fetch(urlForecast);
       const data = await res.json();
       // getInfoCurrent
-      data.data.forEach(element => masRes.push(this.getInfoForecast(element)));
+      data.data.forEach(element => masRes.push(this.getInfoForecast('ss', element)));
       console.log(masRes);
       this.weather.doChangedWeather(masRes, city);
     } catch (error) {
@@ -130,7 +165,7 @@ class App {
           temp: data.temp.toFixed(),
           app_temp: `АДЧУВАЕЦЦА ЯК: ${data.app_temp.toFixed()} °`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
-          datetime: data.ob_time,
+          datetime: getDate(data.timezone),
           description: data.weather.description,
           wind_spd: `ВЕЦЕР: ${data.wind_spd.toFixed()} м/с`,
           rh: `ВІЛЬГОТНАСЦЬ: ${data.rh}%`,
@@ -142,7 +177,7 @@ class App {
           temp: data.temp.toFixed(),
           app_temp: `ОЩУЩАЕТСЯ КАК: ${data.app_temp.toFixed()} °`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
-          datetime: data.ob_time,
+          datetime: getDate(data.timezone),
           description: data.weather.description,
           wind_spd: `ВЕТЕР: ${data.wind_spd.toFixed()} м/с`,
           rh: `ВЛАЖНОСТЬ: ${data.rh}%`,
@@ -154,7 +189,7 @@ class App {
           temp: data.temp.toFixed(),
           app_temp: `FEELS LIKE: ${data.app_temp.toFixed()} °`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
-          datetime: data.ob_time,
+          datetime: getDate(data.timezone),
           description: data.weather.description,
           wind_spd: `WIND: ${data.wind_spd.toFixed()} m/s`,
           rh: `HUMIDITY: ${data.rh}%`,
@@ -164,19 +199,19 @@ class App {
     }
   }
 
-  private getInfoForecast(data: any): CityForecast {
+  private getInfoForecast(day: string, data: any): CityForecast {
     switch (localStorage.language.substr(1, 2)) {
       case 'be': {
         const objBe: CityForecast = {
           temp: data.temp.toFixed(),
-          datetime: data.datetime,
+          datetime: day,
           icon: `../assets/icon/${data.weather.icon}.svg`,
         }
         return objBe;
       }
       case 'ru': {
         const objRu: CityForecast = {
-          datetime: data.datetime,
+          datetime: day,
           temp: data.temp.toFixed(),
           icon: `../assets/icon/${data.weather.icon}.svg`,
         }
@@ -184,7 +219,7 @@ class App {
       }
       default: {
         const objEn: CityForecast = {
-          datetime: data.datetime,
+          datetime: day,
           temp: data.temp.toFixed(),
           icon: `../assets/icon/${data.weather.icon}.svg`,
         }
@@ -222,14 +257,14 @@ class App {
   }
 
   private async doChangeBackground(): Promise<void> {
-    const words = 'nature,day,spring,cloudy';
+    const words = `nature,day,rain`;
     const url = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
       await this.addImageProcess(data.urls.full);
     } catch (error) {
-      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg1.png);`;
+      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg2.png);`;
     }
   }
 
@@ -246,15 +281,6 @@ class App {
     let imgpromise = this.onloadPromise(img);
     await imgpromise;
     document.querySelector('body').style.backgroundImage = `url(${src})`;
-  }
-
-
-  public doChangeLanguage(): void {
-    console.log('Changes doChangeLanguage');
-  }
-
-  public doChangeScale(): void {
-    console.log('Changes doChangeScale');
   }
 
   private initRoot(): void {
