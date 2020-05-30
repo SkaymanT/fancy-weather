@@ -18,6 +18,7 @@ export default class MenuLanguage {
       spanName.innerText = localStorage.getItem('language').substr(1, 2);
     } else {
       spanName.innerText = this.list[0];
+      localStorage.setItem('language', JSON.stringify(this.list[0]));
     }
     buttonDroplist.append(spanName);
     const spanArrow = document.createElement('span');

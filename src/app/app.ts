@@ -129,7 +129,7 @@ class App {
         const objBe: CityInfoCurrent = {
           temp: data.temp.toFixed(),
           app_temp: `АДЧУВАЕЦЦА ЯК: ${data.app_temp.toFixed()} °`,
-          icon: `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`,
+          icon: `../assets/icon/${data.weather.icon}.svg`,
           datetime: data.ob_time,
           description: data.weather.description,
           wind_spd: `ВЕЦЕР: ${data.wind_spd.toFixed()} м/с`,
@@ -141,7 +141,7 @@ class App {
         const objRu: CityInfoCurrent = {
           temp: data.temp.toFixed(),
           app_temp: `ОЩУЩАЕТСЯ КАК: ${data.app_temp.toFixed()} °`,
-          icon: `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`,
+          icon: `../assets/icon/${data.weather.icon}.svg`,
           datetime: data.ob_time,
           description: data.weather.description,
           wind_spd: `ВЕТЕР: ${data.wind_spd.toFixed()} м/с`,
@@ -153,7 +153,7 @@ class App {
         const objEn: CityInfoCurrent = {
           temp: data.temp.toFixed(),
           app_temp: `FEELS LIKE: ${data.app_temp.toFixed()} °`,
-          icon: `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`,
+          icon: `../assets/icon/${data.weather.icon}.svg`,
           datetime: data.ob_time,
           description: data.weather.description,
           wind_spd: `WIND: ${data.wind_spd.toFixed()} m/s`,
@@ -170,7 +170,7 @@ class App {
         const objBe: CityForecast = {
           temp: data.temp.toFixed(),
           datetime: data.datetime,
-          icon: `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`,
+          icon: `../assets/icon/${data.weather.icon}.svg`,
         }
         return objBe;
       }
@@ -178,7 +178,7 @@ class App {
         const objRu: CityForecast = {
           datetime: data.datetime,
           temp: data.temp.toFixed(),
-          icon: `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`,
+          icon: `../assets/icon/${data.weather.icon}.svg`,
         }
         return objRu;
       }
@@ -186,7 +186,7 @@ class App {
         const objEn: CityForecast = {
           datetime: data.datetime,
           temp: data.temp.toFixed(),
-          icon: `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`,
+          icon: `../assets/icon/${data.weather.icon}.svg`,
         }
         return objEn;
       }

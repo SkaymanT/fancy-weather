@@ -22,6 +22,7 @@ export default class TemperatureScale {
       this.temperatureScale.querySelector(`.button--${localStorage.getItem('scale').substr(2, 1).toLowerCase()}`).classList.remove('inactive');
     } else {
       this.temperatureScale.querySelector(`.button--${this.list[1].slice(1).toLowerCase()}`).classList.remove('inactive');
+      localStorage.setItem('scale', JSON.stringify(this.list[1]));
     }
     this.temperatureScale.addEventListener('click', (event) => this.handlerClick(event));
 

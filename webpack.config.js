@@ -1,8 +1,10 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin= require('copy-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const babelOptions = preset => {
   const opts = {
@@ -92,15 +94,18 @@ module.exports = (env, options) => {
     },
 
     plugins: [
-      new CleanWebpackPlugin(), 
+      new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
         template: './src/index.html'
       }),
       new CopyWebpackPlugin([{
         from: './src/assets/img',
         to: './assets/img'
-      },
-    ]),
+      }, ]),
+      new CopyWebpackPlugin([{
+        from: './src/assets/icon',
+        to: './assets/icon'
+      }, ]),
       new MiniCssExtractPlugin({
         filename: 'style.css',
       }),
