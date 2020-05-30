@@ -64,35 +64,31 @@ class App {
     this.LNG = '37.6156';
     this.KEYMAPAPI = 'AIzaSyBcBdvaJ9lvN0GrEy8Rl8FniJ521aokVMM';
     this.timezone = '';
-    this.textLangEn = ['Incorrect city', 'Please enter a city', 'Search city', 'Search'];
-    this.textLangBe = ['Incorrect city', 'Please enter a city', 'Search city', 'Search'];
-    this.textLangRu = ['Incorrect city', 'Please enter a city', 'Search city', 'Search'];
+    this.textLangEn = ['Incorrect data', 'Search city', 'Search'];
+    this.textLangBe = ['Няслушныя дадзеныя', 'Знайсци горад', 'Пошук'];
+    this.textLangRu = ['Неверные данные', 'Найти город', 'Поиск'];
   }
 
 
   public async initApp(): Promise<void> {
     this.initPreloader();
     this.initRoot();
-    this.initControls();
-    this.root.append(this.controls.render(this.textLangEn));
+    this.root.append(this.controls.render(this.defineLanguage()));
     const city = await this.getGeolocation();
     this.root.append(await this.getMain(city));
     this.spinnerOff();
   }
 
-  private initControls(): void {
+  private defineLanguage(): Array<string> {
     switch (localStorage.language.substr(1, 2)) {
       case 'be': {
-        this.root.append(this.controls.render(this.textLangBe));
-        break;
+        return this.textLangBe;
       }
       case 'ru': {
-        this.root.append(this.controls.render(this.textLangRu));
-        break;
+        return this.textLangRu;
       }
       default: {
-        this.root.append(this.controls.render(this.textLangEn));
-        break;
+        return this.textLangEn;
       }
     }
   }
@@ -106,8 +102,10 @@ class App {
 
   public doChangeLanguage(): void {
     console.log('Changes doChangeLanguage');
-    const textLang = ['sss1', 'sss2', 'sss3', 'sss3'];
-    this.controls.search.changedSearch(textLang);
+    this.controls.search.changedSearch(this.defineLanguage());
+    // this.controls.search.changedSearch(this.defineLanguage());
+    // this.controls.search.changedSearch(this.defineLanguage());
+
   }
 
   public doChangeScale(): void {
@@ -140,17 +138,20 @@ class App {
 
   private async doChangesWeather(city: string): Promise<Array<object>> {
     const masRes = [];
-    // const urlCurrent = `https://api.weatherbit.io/v2.0/current?city=Raleigh,NC&key=${this.KEYWEATHER}`;
-    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
+    const forecast: CityForecast[] = [];
+    const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
+    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
     try {
-      const resCurrent = await fetch(urlForecast);
-      const dataCurrent = await resCurrent.json();
-      const res = await fetch(urlForecast);
-      const data = await res.json();
-      // getInfoCurrent
-      data.data.forEach(element => masRes.push(this.getInfoForecast('ss', element)));
-      console.log(masRes);
-      this.weather.doChangedWeather(masRes, city);
+      let requests = [fetch(urlCurrent), fetch(urlForecast)];
+      const responses = await Promise.all(requests);
+      const data = await Promise.all(responses.map(r => r.json()));
+      const days = getWeekDays(data[1].timezone);
+      data[1].data.forEach((element, index) => {
+        if (index !== 0) {
+          forecast.push(this.getInfoForecast(days[index - 1], element));
+        }
+      });
+      this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, city);
     } catch (error) {
       console.log('Error', error);
     }

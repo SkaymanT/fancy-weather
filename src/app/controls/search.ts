@@ -4,8 +4,7 @@ export default class Search {
   searchContainer: HTMLDivElement;
   micro: Micro;
   placeholder: string;
-  errorText: string;
-  incorrectText: string;
+  incorrectData: string;
   nameButton: string;
 
   constructor(doChanges: Function) {
@@ -35,10 +34,9 @@ export default class Search {
   }
 
   private changeText(text: Array<string>): void {
-    this.errorText = text[0];
-    this.incorrectText = text[1];
-    this.placeholder = text[2];
-    this.nameButton = text[3];
+    this.incorrectData = text[0];
+    this.placeholder = text[1];
+    this.nameButton = text[2];
   }
 
   private handlerClick(event): void {
@@ -66,29 +64,29 @@ export default class Search {
   }
 
   private clickButtonSearch(): void {
-    console.log('click');
     let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
     let value = inputElement.value;
-    if (this.validationInput(value)) {
+    if (!this.validationInput(value)) {
       return;
+    } else {
+      this.doChanges(value);
     }
-    this.doChanges(value);
   }
 
   private validationInput(input): boolean {
     let regLang = /[0-9 ]/i;
     let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
     if (input == '') {
-      inputElement.placeholder = this.incorrectText;
-      return;
+      inputElement.placeholder = this.incorrectData;
+      return false;
     }
     if (regLang.test(input)) {
-      inputElement.placeholder = this.errorText;
+      inputElement.placeholder = this.incorrectData;
       inputElement.value = '';
+      return false;
     } else {
-      return;
+      return true;
     }
-    return;
   }
 
   private isClickButtonMicro(event): boolean {
