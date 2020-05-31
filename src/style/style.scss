@@ -339,13 +339,14 @@ body {
   right: 10.5rem;
   width: 3rem;
   height: 4rem;
-  opacity: .8;
+  opacity: .9;
   background: url(../assets/img/microphone.svg) 50% no-repeat;
   background-size: 50%
 }
 
 .button-micro.active {
-  opacity: 1;
+  background: url(../assets/img/microphone-active.svg) 50% no-repeat;
+  background-size: 50%;
 }
 
 .inactive {

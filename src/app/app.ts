@@ -51,8 +51,13 @@ class App {
   textLangEn: Array<string>;
   textLangRu: Array<string>;
   textLangBe: Array<string>;
+  city: string;
+  listLanguage: Array<string>;
+  listScale: Array<string>;
   constructor() {
-    this.controls = new Controls(this.doChangesFromControls.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this));
+    this.listScale = ['°F', '°C'];
+    this.listLanguage = ['en', 'ru', 'be'];
+    this.controls = new Controls(this.doChangesFromControls.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.listLanguage, this.listScale);
     this.weather = new Weather(this.doChangesFromControls.bind(this));
     this.map = new Map();
     this.KEYIMAGEAPI = 'GZ3T-OqnbT6kW0m8CccKw-ucz4MaeTsJ29r2rKflNoQ';
@@ -67,52 +72,51 @@ class App {
     this.textLangEn = ['Incorrect data', 'Search city', 'Search'];
     this.textLangBe = ['Няслушныя дадзеныя', 'Знайсци горад', 'Пошук'];
     this.textLangRu = ['Неверные данные', 'Найти город', 'Поиск'];
+    this.city = 'Minsk';
   }
 
 
   public async initApp(): Promise<void> {
     this.initPreloader();
     this.initRoot();
-    this.root.append(this.controls.render(this.defineLanguage()));
-    const city = await this.getGeolocation();
-    this.root.append(await this.getMain(city));
+    if (!localStorage.scale) {
+      localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
+    }
+
+    this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2)));
+    this.root.append(await this.getMain());
     this.spinnerOff();
   }
 
-  private defineLanguage(): Array<string> {
-    switch (localStorage.language.substr(1, 2)) {
-      case 'be': {
-        return this.textLangBe;
-      }
-      case 'ru': {
-        return this.textLangRu;
-      }
-      default: {
-        return this.textLangEn;
-      }
-    }
-  }
-
   public async doChangesFromControls(textCity): Promise<void> {
-    await this.doChangesWeather(textCity);
-    // await this.doChangesGeocording(text);
-    // await this.doChangesGeocording(text);
-    console.log('Changes ', textCity);
+    this.city = textCity;
+    await this.doChangesWeather();
+    this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
+    console.log('Search ', this.city);
   }
 
-  public doChangeLanguage(): void {
-    console.log('Changes doChangeLanguage');
+  public doChangeLanguage(language): void {
+    if (!localStorage.scale) {
+      localStorage.setItem('language', JSON.stringify(this.listLanguage[0]));
+    } else {
+      localStorage.setItem('language', JSON.stringify(language));
+    }
     this.controls.search.changedSearch(this.defineLanguage());
-    // this.controls.search.changedSearch(this.defineLanguage());
-    // this.controls.search.changedSearch(this.defineLanguage());
-
+    this.doChangesWeather();
+    this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
   }
 
-  public doChangeScale(): void {
-    console.log('Changes doChangeScale');
+  public doChangeScale(scale): void {
+    if (!localStorage.scale) {
+      localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
+    } else {
+      localStorage.setItem('scale', JSON.stringify(scale));
+    }
+    this.doChangesWeather();
   }
 
-  private async getMain(city: string): Promise<HTMLDivElement> {
+  private async getMain(): Promise<HTMLDivElement> {
+    this.city = await this.getMyGeolocation();
     const main = document.createElement('div');
     main.classList.add('main-container');
     const forecast: CityForecast[] = [];
@@ -128,7 +132,7 @@ class App {
           forecast.push(this.getInfoForecast(days[index - 1], element));
         }
       });
-      main.append(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, city));
+      main.append(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, this.city));
       main.append(await this.map.render(this.LAT, this.LNG, localStorage.language.substr(1, 2)));
     } catch (error) {
       console.log('Error', error);
@@ -136,8 +140,8 @@ class App {
     return main;
   }
 
-  private async doChangesWeather(city: string): Promise<Array<object>> {
-    const masRes = [];
+  private async doChangesWeather(): Promise<void> {
+    this.city = await this.getGeolocationCity(this.city);
     const forecast: CityForecast[] = [];
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
     const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
@@ -151,12 +155,10 @@ class App {
           forecast.push(this.getInfoForecast(days[index - 1], element));
         }
       });
-      this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, city);
+      this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
     } catch (error) {
       console.log('Error', error);
     }
-    console.log('Changes ', city);
-    return masRes;
   }
 
   private getInfoCurrent(data: any): CityInfoCurrent {
@@ -229,34 +231,6 @@ class App {
     }
   }
 
-
-  public async doChangesGeocording(text: string): Promise<void> {
-    const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=Moscow&country=RU&days=3&units=S&lang=be&key=619b6dd131094859b162bb2577321b2a`;
-    // const url = `https://api.opencagedata.com/geocode/v1/json?q=Minsk&key=${this.KEYGEOCORDING}&pretty=1&no_annotations=1`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      console.log(data);
-
-    } catch (error) {
-      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg1.png);`;
-    }
-    console.log('Changes ', text);
-  }
-
-  public async doChangesMap(text: string): Promise<void> {
-    const url = `https://api.opencagedata.com/geocode/v1/json?q=Minsk&key=${this.KEYGEOCORDING}&pretty=1&no_annotations=1`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      console.log(data);
-
-    } catch (error) {
-      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg1.png);`;
-    }
-    console.log('Changes ', text);
-  }
-
   private async doChangeBackground(): Promise<void> {
     const words = `nature,day,rain`;
     const url = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
@@ -305,7 +279,7 @@ class App {
     preloader.classList.add('open');
   }
 
-  private async getGeolocation(): Promise<string> {
+  private async getMyGeolocation(): Promise<string> {
     const urlLocation = `https://ipinfo.io/json?token=${this.KEYGEOlOCATION}`;
     let city = '';
     try {
@@ -315,7 +289,20 @@ class App {
       const resGeocoding = await fetch(urlGeocoding);
       const dataGeocoding = await resGeocoding.json();
       city = dataGeocoding.results[0].formatted;
-      [this.LAT, this.LNG] = [dataGeocoding.results[0].geometry.lat, dataGeocoding.results[0].geometry.lng];
+      [this.LAT, this.LNG] = [dataGeocoding.results[0].geometry.lat.toString(), dataGeocoding.results[0].geometry.lng.toString()];
+    } catch (error) {
+      console.log('Error', error);
+    }
+    return city;
+  }
+
+  private async getGeolocationCity(city: string): Promise<string> {
+    try {
+      const urlGeocoding = `https://api.opencagedata.com/geocode/v1/json?q=${city}&key=${this.KEYGEOCORDING}&pretty=1&no_annotations=1&language=${localStorage.language.substr(1, 2)}`;
+      const resGeocoding = await fetch(urlGeocoding);
+      const dataGeocoding = await resGeocoding.json();
+      city = dataGeocoding.results[0].formatted;
+      [this.LAT, this.LNG] = [dataGeocoding.results[0].geometry.lat.toString(), dataGeocoding.results[0].geometry.lng.toString()];
     } catch (error) {
       console.log('Error', error);
     }
@@ -324,6 +311,9 @@ class App {
 
   private getCodeScaleForSearch(): string {
     let scale = '';
+    if (!localStorage.scale) {
+      localStorage.setItem('scale', JSON.stringify(this.listScale[0]));
+    }
     if (localStorage.scale.substr(2, 1) === 'F') {
       scale = 'I';
     }
@@ -333,5 +323,20 @@ class App {
     return scale;
   }
 
-
+  private defineLanguage(): Array<string> {
+    if (!localStorage.language) {
+      localStorage.setItem('language', JSON.stringify(this.listLanguage[0]));
+    }
+    switch (localStorage.language.substr(1, 2)) {
+      case 'be': {
+        return this.textLangBe;
+      }
+      case 'ru': {
+        return this.textLangRu;
+      }
+      default: {
+        return this.textLangEn;
+      }
+    }
+  }
 }

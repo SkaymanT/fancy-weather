@@ -34,10 +34,12 @@ export default class Weather {
   }
 
   public refreshTime(): void {
-    if (localStorage.timezone) {
-      document.querySelector('.weather-container__date-time').innerHTML = getDate(localStorage.timezone.substring(1, localStorage.timezone.length - 1));
-    } else {
-      document.querySelector('.weather-container__date-time').innerHTML = getDate('Europe/Minsk');
+    if (document.querySelector('.weather-container__date-time')) {
+      if (localStorage.timezone) {
+        document.querySelector('.weather-container__date-time').innerHTML = getDate(localStorage.timezone.substring(1, localStorage.timezone.length - 1));
+      } else {
+        document.querySelector('.weather-container__date-time').innerHTML = getDate('Europe/Minsk');
+      }
     }
   }
 
@@ -53,10 +55,13 @@ export default class Weather {
     weatherData[1].innerHTML = day.app_temp;
     weatherData[2].innerHTML = day.wind_spd;
     weatherData[3].innerHTML = day.rh;
-    days.forEach(element => {
-      this.weatherContainer.querySelector('.forecast__day').innerHTML = element['datetime'];
-      this.weatherContainer.querySelector('.forecast__temperature').innerHTML = element['temp'];
-      this.weatherContainer.querySelector('.forecast__icon').innerHTML = element['icon'];
+    let forecastDay = this.weatherContainer.querySelectorAll('.forecast__day');
+    let forecastTemperature = this.weatherContainer.querySelectorAll('.forecast__temperature');
+    let forecastIcon = this.weatherContainer.querySelectorAll('.forecast__icon');
+    days.forEach((element, index) => {
+      forecastDay[index].innerHTML = element['datetime'];
+      forecastTemperature[index].innerHTML = element['temp'];
+      forecastIcon[index].innerHTML = element['icon'];
     });
   }
 
