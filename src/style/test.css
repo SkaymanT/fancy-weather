@@ -1,0 +1,97 @@
+.modal {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 21
+}
+
+.modal-info {
+  position: relative;
+  z-index: 22;
+  max-width: 400px;
+  padding: 20px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 10px
+}
+
+.info-wrapper {
+  display: flex;
+  flex-direction: column
+}
+
+.modal-info__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 42px;
+  line-height: 22px;
+  color: rgba(59, 168, 252, .7);
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  opacity: .5;
+  transition: opacity .3s
+}
+
+.modal-info__close:hover {
+  background: transparent;
+  opacity: 1
+}
+
+.info__header {
+  margin-bottom: 15px;
+  text-align: center
+}
+
+.info__paragraph,
+.info__text {
+  margin-top: 10px
+}
+
+.modal-fade-enter-active {
+  -webkit-animation: show-in .4s;
+  animation: show-in .4s
+}
+
+.modal-fade-leave-active {
+  animation: show-in .4s reverse
+}
+
+@media (hover:hover) {
+  .modal-info__close:hover {
+    background: transparent;
+    opacity: 1
+  }
+}
+
+@-webkit-keyframes show-in {
+  0% {
+    transform: translateY(-100%)
+  }
+
+  to {
+    transform: translateY(0)
+  }
+}
+
+@keyframes show-in {
+  0% {
+    transform: translateY(-100%)
+  }
+
+  to {
+    transform: translateY(0)
+  }
+}
+
+.modal__overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, .7)
+}

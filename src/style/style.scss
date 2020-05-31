@@ -1,4 +1,5 @@
 @import './preloader.scss';
+@import './message.scss';
 
 *,
 :after,
@@ -148,6 +149,16 @@ body {
   display: inline-flex;
 }
 
+.button-speaker {
+  margin-left: 1rem;
+  cursor: pointer
+}
+
+.button-helper {
+  margin-left: 1rem;
+  cursor: pointer
+}
+
 
 .button--f {
   border-radius: .5rem 0 0 .5rem;
@@ -200,6 +211,20 @@ body {
   width: 2rem;
   height: 2rem;
   background: url(../assets/img/spinner.svg) 50% no-repeat;
+}
+
+.speaker {
+  width: 2rem;
+  height: 2rem;
+  background: url(../assets/img/speaker.svg) 50% no-repeat;
+  background-size: 100%;
+}
+
+.helper {
+  width: 2rem;
+  height: 2rem;
+  background: url(../assets/img/helper.svg) 50% no-repeat;
+  background-size: 70%;
 }
 
 .spinner-refresh {
@@ -445,10 +470,10 @@ body {
   height: 6.7rem
 }
 
-.map-container__map {
+.map-container__mask {
+  clip-path: polygon(5% 0, 95% 0, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0 95%, 0 5%);
   width: 37.5rem;
   height: 37.5rem;
-  border-radius: 5%;
   overflow: hidden
 }
 
@@ -464,7 +489,7 @@ body {
   -webkit-transform: translate(-25%, -25%);
   transform: translate(-25%, -25%);
   border: 0;
-  border-radius: 5%
+  border-radius: 5%;
 }
 
 .search-field-error {

@@ -88,6 +88,7 @@ export default class Search {
       return false;
     } else {
       inputElement.classList.remove('search-field-error');
+      inputElement.value = '';
       return true;
     }
   }

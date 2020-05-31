@@ -5,6 +5,7 @@ import Map from './main/map';
 import { getLoader } from './component/loader';
 import { getDate, getWeekDays } from './component/week';
 import { getFooter, updateFooter } from './component/footer';
+import { getMessage, updateMessage } from './component/message';
 
 
 window.onload = () => {
@@ -53,13 +54,19 @@ class App {
   textLangRu: Array<string>;
   textLangBe: Array<string>;
   city: string;
+  textSpeak: string;
+  textFooter: string;
+  textHelp: Array<string>;
   listLanguage: Array<string>;
   listScale: Array<string>;
   constructor() {
     this.listScale = ['°F', '°C'];
     this.listLanguage = ['en', 'ru', 'be'];
-    this.controls = new Controls(this.doChangesFromControls.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.listLanguage, this.listScale);
-    this.weather = new Weather(this.doChangesFromControls.bind(this));
+    this.textSpeak = 'Minsk';
+    this.textFooter = 'Minsk';
+    this.textHelp = ['Incorrect data', 'Search city', 'Search'];
+    this.controls = new Controls(this.doChangesCityFromSearch.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.listLanguage, this.listScale, this.textSpeak, this.textHelp);
+    this.weather = new Weather(this.doChangesCityFromSearch.bind(this));
     this.map = new Map();
     this.KEYIMAGEAPI = 'GZ3T-OqnbT6kW0m8CccKw-ucz4MaeTsJ29r2rKflNoQ';
     this.KEYCURRENT = '20fe2091eb094bb1890cccc4ec32592f';
@@ -71,7 +78,7 @@ class App {
     this.KEYMAPAPI = 'AIzaSyBcBdvaJ9lvN0GrEy8Rl8FniJ521aokVMM';
     this.timezone = '';
     this.textLangEn = ['Incorrect data', 'Search city', 'Search'];
-    this.textLangBe = ['Няслушныя дадзеныя', 'Знайсци горад', 'Пошук'];
+    this.textLangBe = ['Няслушныя дадзеныя', 'Знайсцi горад', 'Пошук'];
     this.textLangRu = ['Неверные данные', 'Найти город', 'Поиск'];
     this.city = 'Minsk';
   }
@@ -79,6 +86,7 @@ class App {
 
   public async initApp(): Promise<void> {
     this.initPreloader();
+    this.initMessage();
     this.initRoot();
     if (!localStorage.scale) {
       localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
@@ -86,34 +94,41 @@ class App {
     this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2)));
     this.root.append(await this.getMain());
     this.root.append(getFooter());
+    await this.doChangeBackground();
+    this.spinnerOff();
+
+  }
+
+  public async doChangesCityFromSearch(textCity): Promise<void> {
+    this.city = textCity;
+    this.spinnerOn();
+    await this.doChangesWeather();
+    this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
     this.spinnerOff();
   }
 
-  public async doChangesFromControls(textCity): Promise<void> {
-    this.city = textCity;
-    await this.doChangesWeather();
-    this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
-    console.log('Search ', this.city);
-  }
-
-  public doChangeLanguage(language): void {
+  public async doChangeLanguage(language): Promise<void> {
     if (!localStorage.scale) {
       localStorage.setItem('language', JSON.stringify(this.listLanguage[0]));
     } else {
       localStorage.setItem('language', JSON.stringify(language));
     }
+    this.spinnerOn();
     this.controls.search.changedSearch(this.defineLanguage());
-    this.doChangesWeather();
+    await this.doChangesWeather();
     this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
+    this.spinnerOff();
   }
 
-  public doChangeScale(scale): void {
+  public async doChangeScale(scale): Promise<void> {
     if (!localStorage.scale) {
       localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
     } else {
       localStorage.setItem('scale', JSON.stringify(scale));
     }
-    this.doChangesWeather();
+    this.spinnerOn();
+    await this.doChangesWeather();
+    this.spinnerOff();
   }
 
   private async getMain(): Promise<HTMLDivElement> {
@@ -270,14 +285,9 @@ class App {
     const body = document.querySelector('body')!;
     body.prepend(getLoader());
   }
-
-  private async spinnerOff(): Promise<void> {
-    let preloader = document.querySelector('.preloader');
-    await this.doChangeBackground();
-    if (!preloader.classList.contains('done')) {
-      preloader.classList.add('done');
-    }
-    preloader.classList.add('open');
+  private initMessage(): void {
+    const body = document.querySelector('body')!;
+    body.prepend(getMessage(this.textHelp));
   }
 
   private async getMyGeolocation(): Promise<string> {
@@ -340,4 +350,20 @@ class App {
       }
     }
   }
+
+  private spinnerOn(): void {
+    let preloader = document.querySelector('.preloader');
+    if (preloader.classList.contains('done')) {
+      preloader.classList.remove('done');
+    }
+  }
+
+  private spinnerOff(): void {
+    let preloader = document.querySelector('.preloader');
+    if (!preloader.classList.contains('done')) {
+      preloader.classList.add('done');
+    }
+    preloader.classList.add('open');
+  }
+
 }

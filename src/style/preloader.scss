@@ -24,18 +24,20 @@
     opacity: 0;
     visibility: hidden;
   }
+
   &.open {
-    background: rgba(189, 190, 189, 0.1);
+    background: rgba(0, 0, 0, .7);
 
     .cssload-loader {
       position: absolute;
       left: 50%;
-      top: 30%;
+      top: 35%;
       transform: translate(-30%, -50%);
-      width: 40px;
-      height: 40px;
+      width: 70px;
+      height: 70px;
       perspective: 780px;
     }
+
   }
 
   .cssload-inner {

@@ -28,10 +28,9 @@ export default class RefreshButton {
     return event.target.classList.contains('spinner') || event.target.classList.contains('button-refresh');
   }
 
-  async clickButtonRefresh(event): Promise<string> {
+  private async clickButtonRefresh(event): Promise<void> {
     this.refreshButton.querySelector('.spinner').classList.add('spinner-refresh');
     await this.doChanges();
     this.refreshButton.querySelector('.spinner').classList.remove('spinner-refresh');
-    return 'end';
   }
 }
