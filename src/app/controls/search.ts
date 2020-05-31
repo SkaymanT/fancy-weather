@@ -78,13 +78,16 @@ export default class Search {
     let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
     if (input == '') {
       inputElement.placeholder = this.incorrectData;
+      inputElement.classList.add('search-field-error');
       return false;
     }
     if (regLang.test(input)) {
       inputElement.placeholder = this.incorrectData;
+      inputElement.classList.add('earch-field-error');
       inputElement.value = '';
       return false;
     } else {
+      inputElement.classList.remove('search-field-error');
       return true;
     }
   }

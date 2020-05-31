@@ -4,6 +4,7 @@ import Weather from './main/weather';
 import Map from './main/map';
 import { getLoader } from './component/loader';
 import { getDate, getWeekDays } from './component/week';
+import { getFooter, updateFooter } from './component/footer';
 
 
 window.onload = () => {
@@ -82,9 +83,9 @@ class App {
     if (!localStorage.scale) {
       localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
     }
-
     this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2)));
     this.root.append(await this.getMain());
+    this.root.append(getFooter());
     this.spinnerOff();
   }
 

@@ -522,7 +522,7 @@ body {
   }
 }
 
-.ticker-wrapper {
+.footer-container {
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -534,7 +534,7 @@ body {
   background: linear-gradient(0deg, rgba(43, 43, 66, .6), rgba(43, 43, 66, .6) 50%, rgba(43, 43, 66, 0))
 }
 
-.ticker-wrapper .ticker {
+.footer-container .ticker {
   display: inline-block;
   height: 4rem;
   box-sizing: content-box;
@@ -545,7 +545,7 @@ body {
   animation: ticker 120s linear infinite
 }
 
-.ticker-wrapper .ticker__item {
+.footer-container .ticker__item {
   display: inline-block;
   padding: 0 2rem;
   font-size: 1.4rem;
@@ -598,7 +598,7 @@ body {
     margin: 0 2.5rem
   }
 
-  .ticker-wrapper {
+  .footer-container {
     display: none
   }
 }
