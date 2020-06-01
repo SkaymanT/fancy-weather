@@ -218,7 +218,14 @@ body {
   width: 2rem;
   height: 2rem;
   background: url(../assets/img/speaker.svg) 50% no-repeat;
-  background-size: 100%;
+  background-size: 80%;
+
+  &.active-speaker {
+    width: 2rem;
+    height: 2rem;
+    background: url(../assets/img/stop-speaker.svg) 50% no-repeat;
+    background-size: 80%;
+  }
 }
 
 .helper {

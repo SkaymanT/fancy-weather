@@ -23,22 +23,22 @@ export default class Controls {
     this.helper = new Helper(textHelp, doMessage);
   }
 
-  public render(text: Array<string>, language: string, scale: string): HTMLDivElement {
+  public render(text: Array<string>, language: string, scale: string, volumeSpeaker: number): HTMLDivElement {
     this.controlsContainer = document.createElement('div');
     this.controlsContainer.classList.add('controls-container');
-    this.controlsContainer.append(this.getControlsButtons(scale, language));
+    this.controlsContainer.append(this.getControlsButtons(scale, language, volumeSpeaker));
     this.controlsContainer.append(this.search.render(text));
 
     return this.controlsContainer;
   }
 
-  private getControlsButtons(scale: string, language: string): HTMLDivElement {
+  private getControlsButtons(scale: string, language: string, volumeSpeaker: number): HTMLDivElement {
     const btns = document.createElement('div');
     btns.classList.add('controls-btns-container');
     btns.append(this.refreshButton.render());
     btns.append(this.menuLanguage.render(language));
     btns.append(this.temperatureScale.render(scale));
-    btns.append(this.speaker.getSpeaker());
+    btns.append(this.speaker.getSpeaker(language, volumeSpeaker));
     btns.append(this.helper.getHelper());
     return btns;
   }

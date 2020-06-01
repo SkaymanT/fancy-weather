@@ -2,23 +2,70 @@ export default class Speaker {
 
   textSpeaker: string;
   responsiveVoice: any;
+  buttonSpeaker: HTMLButtonElement;
+  language: string;
+  volumeSpeaker: number;
+
   constructor(text) {
     this.textSpeaker = text;
+    this.buttonSpeaker = document.createElement('button');
   }
 
-  public getSpeaker(): HTMLButtonElement {
-    const buttonSpeaker = document.createElement('button');
-    buttonSpeaker.classList.add('button-speaker');
-    buttonSpeaker.classList.add('button');
+  public getSpeaker(language: string, volumeSpeaker: number): HTMLButtonElement {
+    this.language = language;
+    this.volumeSpeaker = volumeSpeaker;
+    this.buttonSpeaker.classList.add('button-speaker');
+    this.buttonSpeaker.classList.add('button');
     const spinnerButton = document.createElement('div');
     spinnerButton.classList.add('speaker');
-    buttonSpeaker.append(spinnerButton);
-    buttonSpeaker.addEventListener('click', (event) => this.handlerClick(event));
-    return buttonSpeaker;
+    this.buttonSpeaker.append(spinnerButton);
+    this.buttonSpeaker.addEventListener('click', (event) => this.handlerClick(event));
+    return this.buttonSpeaker;
   }
 
-  public onSpeaker(text): void {
-    responsiveVoice.speak(text, "UK English Male", { volume: 1 });
+  public updateSpeaker(text: string, language: string, volumeSpeaker: number) {
+    this.language = language;
+    this.textSpeaker = text;
+    this.volumeSpeaker = volumeSpeaker;
+  }
+
+  public onSpeaker(text: string, language: string, volumeSpeaker: number): void {
+    switch (language) {
+      case 'ru': {
+        if (!this.buttonSpeaker.querySelector('.speaker').classList.contains('active-speaker')) {
+          responsiveVoice.speak(text, "Russian Male", { onend: this.endCallback, volume: volumeSpeaker });
+          this.buttonSpeaker.querySelector('.speaker').classList.add('active-speaker');
+        } else {
+          this.buttonSpeaker.querySelector('.speaker').classList.remove('active-speaker');
+          responsiveVoice.cancel();
+        }
+        break;
+      }
+      case 'be': {
+        if (!this.buttonSpeaker.querySelector('.speaker').classList.contains('active-speaker')) {
+          responsiveVoice.speak(text, "Russian Male", { onend: this.endCallback, volume: volumeSpeaker });
+          this.buttonSpeaker.querySelector('.speaker').classList.add('active-speaker');
+        } else {
+          this.buttonSpeaker.querySelector('.speaker').classList.remove('active-speaker');
+          responsiveVoice.cancel();
+        }
+        break;
+      }
+      default: {
+        if (!this.buttonSpeaker.querySelector('.speaker').classList.contains('active-speaker')) {
+          responsiveVoice.speak(text, "US English Female", { onend: this.endCallback, volume: volumeSpeaker });
+          this.buttonSpeaker.querySelector('.speaker').classList.add('active-speaker');
+        } else {
+          this.buttonSpeaker.querySelector('.speaker').classList.remove('active-speaker');
+          responsiveVoice.cancel();
+        }
+        break;
+      }
+    }
+  }
+
+  private endCallback(): void {
+    document.querySelector('.speaker').classList.remove('active-speaker');
   }
 
   private handlerClick(event): void {
@@ -32,7 +79,7 @@ export default class Speaker {
   }
 
   private clickButtonSpeak(event): void {
-    this.onSpeaker(this.textSpeaker);
+    this.onSpeaker(this.textSpeaker, this.language, this.volumeSpeaker);
   }
 
 }

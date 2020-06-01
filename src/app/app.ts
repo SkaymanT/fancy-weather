@@ -56,6 +56,7 @@ class App {
   textLangBe: Array<string>;
   city: string;
   timesDay: string;
+  volume: number;
   weatherDescription: string;
   textSpeak: string;
   showDays: number;
@@ -68,11 +69,11 @@ class App {
   constructor() {
     this.listScale = ['°F', '°C'];
     this.listLanguage = ['en', 'ru', 'be'];
-    this.textSpeak = 'Minsk';
+    this.textSpeak = 'Минск, Беларусь, небольшой дождь, ↵       12°C,         ощущается как 5°C,         ветер 9 м/с,         влажность 62%';
     this.contentFooter = [];
-    this.textHelpBe = ['Інфармацыя', 'Спіс галасавых каманд:', `"Прырода" -  Запусціць галасавое апавяшчэнне`, '"Плюс" - Павелічэнне гучнасці', '"Мінус" - Паменшыць гучнасць', 'Дадатковы функцыянал:', 'Бегавая дарожка з больш падрабязным прагнозам на 3 дні'];
-    this.textHelpRu = ['Информация', 'Список голосовых команд:', '"Природа" - Запустить голосовое уведомление', '"Плюс" - Увеличить громкость', '"Минус" - Уменьшить громкость', 'Дополнительный функционал:', 'Бегущая строка с более подробным прогнозом на 3 дня'];
-    this.textHelpEn = ['Information', 'List of voice commands:', '"Nature" - Run voice notification', '"Plus" - Increase the volume', '"Minus" - Decrease the volume', 'Additional functionality:', 'ticker with a more detailed forecast for 3 days'];
+    this.textHelpBe = ['Інфармацыя', 'Спіс галасавых каманд:', `"Прырода" -  Запусціць галасавое апавяшчэнне`, '"Плюс" - Павелічэнне гучнасці', '"Мінус" - Паменшыць гучнасць', 'Дадатковы функцыянал:', 'Бегавая дарожка з больш падрабязным прагнозам на тыдзень'];
+    this.textHelpRu = ['Информация', 'Список голосовых команд:', '"Природа" - Запустить голосовое уведомление', '"Плюс" - Увеличить громкость', '"Минус" - Уменьшить громкость', 'Дополнительный функционал:', 'Бегущая строка с более подробным прогнозом на неделю'];
+    this.textHelpEn = ['Information', 'List of voice commands:', '"Nature" - Run voice notification', '"Plus" - Increase the volume', '"Minus" - Decrease the volume', 'Additional functionality:', 'ticker with a more detailed forecast for week'];
     this.controls = new Controls(this.doChangesCityFromSearch.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.doMessage.bind(this), this.listLanguage, this.listScale, this.textSpeak, this.textHelpEn);
     this.weather = new Weather(this.doChangesCityFromSearch.bind(this));
     this.map = new Map();
@@ -93,6 +94,7 @@ class App {
     this.timesDay = 'night';
     this.weatherDescription = 'rain';
     this.showDays = 4;
+    this.volume = 1;
   }
 
 
@@ -103,7 +105,7 @@ class App {
     if (!localStorage.scale) {
       localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
     }
-    this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2)));
+    this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2), this.volume));
     this.root.append(await this.getMain());
     this.root.append(getFooter(this.contentFooter));
     await this.doChangeBackground();
@@ -115,6 +117,7 @@ class App {
     this.city = textCity;
     this.spinnerOn();
     await this.doChangesWeather();
+    this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
     this.spinnerOff();
   }
@@ -128,6 +131,7 @@ class App {
     this.spinnerOn();
     this.controls.search.changedSearch(this.defineLanguage());
     await this.doChangesWeather();
+    this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
     this.spinnerOff();
   }
@@ -140,6 +144,7 @@ class App {
     }
     this.spinnerOn();
     await this.doChangesWeather();
+    this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     this.spinnerOff();
   }
 
@@ -159,7 +164,6 @@ class App {
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map(r => r.json()));
       const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
-      console.log(daysWeek);
       data[1].data.forEach((element, index) => {
         if (index !== 0 && index < this.showDays) {
           forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
@@ -176,6 +180,7 @@ class App {
 
   private async doChangesWeather(): Promise<void> {
     this.city = await this.getGeolocationCity(this.city);
+    console.log(this.city);
     const forecast: CityForecast[] = [];
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
     const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
@@ -198,6 +203,7 @@ class App {
   }
 
   private getInfoCurrent(data: any): CityInfoCurrent {
+    this.getInfoSpeak(data);
     switch (localStorage.language.substr(1, 2)) {
       case 'be': {
         this.message.updateMessage(this.textHelpBe);
@@ -241,6 +247,24 @@ class App {
     }
   }
 
+  private getInfoSpeak(data: any): void {
+    this.textSpeak = '';
+    console.log('change');
+    switch (localStorage.language.substr(1, 2)) {
+      case 'be': {
+        this.textSpeak = `${this.city}, ${data.weather.description}, ${data.temp.toFixed()} адчуваецца як: ${data.app_temp.toFixed()}, вецер: ${data.wind_spd.toFixed()} м/с, вільготнасць: ${data.rh}%`;
+        break;
+      }
+      case 'ru': {
+        this.textSpeak = `${this.city}, ${data.weather.description}, ${data.temp.toFixed()} ощущается как: ${data.app_temp.toFixed()}, ветер: ${data.wind_spd.toFixed()} м/с, влажность: ${data.rh}%`;
+        break;
+      }
+      default: {
+        this.textSpeak = `${this.city}, ${data.weather.description}, ${data.temp.toFixed()} feels like: ${data.app_temp.toFixed()}, wind: ${data.wind_spd.toFixed()} м/с, humidity: ${data.rh}%`;
+      }
+    }
+  }
+
   private getInfoForecast(day: string, data: any): CityForecast {
     const obj: CityForecast = {
       datetime: day,
@@ -251,8 +275,6 @@ class App {
   }
 
   private getInfoFooterContent(days: Array<string>, data: any): void {
-    console.log(days);
-    console.log(data.data);
     this.contentFooter = [];
     switch (localStorage.language.substr(1, 2)) {
       case 'be': {
@@ -291,7 +313,6 @@ class App {
         });
       }
     }
-    console.log(this.contentFooter);
   }
 
   private async doChangeBackground(): Promise<void> {
