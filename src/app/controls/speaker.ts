@@ -19,10 +19,6 @@ export default class Speaker {
 
   public onSpeaker(text): void {
     responsiveVoice.speak(text, "UK English Male", { volume: 1 });
-    // let voices = speechSynthesis.getVoices();
-    // let utterance = new SpeechSynthesisUtterance(text);
-    // utterance.voice = voices[4];
-    // speechSynthesis.speak(utterance);
   }
 
   private handlerClick(event): void {

@@ -27,23 +27,39 @@ export function getDate(timezone: string): string {
 
 
 
-export function getWeekDays(timezone: string): Array<string> {
+export function getWeekDays(timezone: string, countDays: number): Array<string> {
     let zoneTime = new Date().toLocaleString("en-US", { timeZone: timezone });
     const date = new Date(zoneTime);
     let daysRu = new Array('Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота');
     let daysEn = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-    let daysBe = new Array('Нядзеля', 'Панядзелак', 'Аўторак', 'Серада', 'Чацьвер', 'Пятніца', 'Субота');
+    let daysBe = new Array('Нядзеля', 'Панядзелак', 'Аўторак', 'Серада', 'Чацвер', 'Пятніца', 'Субота');
     if (localStorage.language) {
         if (localStorage.language.substr(1, 2) === 'en') {
-            return [daysEn[(date.getDay() + 1) % 7], daysEn[(date.getDay() + 2) % 7], daysEn[(date.getDay() + 3) % 7]];
+            let result: Array<string> = [];
+            for (let i = 0; i < countDays; ++i) {
+                result.push(daysEn[(date.getDay() + i + 1) % 7]);
+            }
+            return result;
         }
         if (localStorage.language.substr(1, 2) === 'ru') {
-            return [daysRu[(date.getDay() + 1) % 7], daysRu[(date.getDay() + 2) % 7], daysRu[(date.getDay() + 3) % 7]];
+            let result: Array<string> = [];
+            for (let i = 0; i < countDays; ++i) {
+                result.push(daysRu[(date.getDay() + i + 1) % 7]);
+            }
+            return result;
         }
         if (localStorage.language.substr(1, 2) === 'be') {
-            return [daysBe[(date.getDay() + 1) % 7], daysBe[(date.getDay() + 2) % 7], daysBe[(date.getDay() + 3) % 7]];
+            let result: Array<string> = [];
+            for (let i = 0; i < countDays; ++i) {
+                result.push(daysBe[(date.getDay() + i + 1) % 7]);
+            }
+            return result;
         }
     } else {
-        return [daysEn[date.getDay() + 1], daysEn[date.getDay() + 2], daysEn[date.getDay() + 3]];
+        let result: Array<string> = [];
+        for (let i = 0; i < countDays; ++i) {
+            result.push(daysEn[(date.getDay() + i + 1) % 7]);
+        }
+        return result;
     }
 }

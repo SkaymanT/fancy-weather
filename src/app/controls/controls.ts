@@ -14,13 +14,13 @@ export default class Controls {
   temperatureScale: TemperatureScale;
   controlsContainer: HTMLDivElement;
 
-  constructor(doChanges: Function, doChangeBackground: Function, doChangeLanguage: Function, doChangeScale: Function, listLanguage: Array<string>, listScale: Array<string>, textSpeak: string, textHelp: Array<string>) {
+  constructor(doChanges: Function, doChangeBackground: Function, doChangeLanguage: Function, doChangeScale: Function, doMessage: Function, listLanguage: Array<string>, listScale: Array<string>, textSpeak: string, textHelp: Array<string>) {
     this.search = new Search(doChanges);
     this.refreshButton = new RefreshButton(doChangeBackground);
     this.menuLanguage = new MenuLanguage(doChangeLanguage, listLanguage);
     this.temperatureScale = new TemperatureScale(doChangeScale, listScale);
     this.speaker = new Speaker(textSpeak);
-    this.helper = new Helper(textHelp);
+    this.helper = new Helper(textHelp, doMessage);
   }
 
   public render(text: Array<string>, language: string, scale: string): HTMLDivElement {

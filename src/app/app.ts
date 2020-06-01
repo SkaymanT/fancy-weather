@@ -5,7 +5,7 @@ import Map from './main/map';
 import { getLoader } from './component/loader';
 import { getDate, getWeekDays } from './component/week';
 import { getFooter, updateFooter } from './component/footer';
-import { getMessage, updateMessage } from './component/message';
+import Message from './component/message';
 
 
 window.onload = () => {
@@ -39,6 +39,7 @@ class App {
   controls: Controls;
   weather: Weather;
   map: Map;
+  message: Message;
   root: HTMLDivElement;
   preloader: HTMLDivElement;
   KEYIMAGEAPI: string;
@@ -54,20 +55,28 @@ class App {
   textLangRu: Array<string>;
   textLangBe: Array<string>;
   city: string;
+  timesDay: string;
+  weatherDescription: string;
   textSpeak: string;
-  textFooter: string;
-  textHelp: Array<string>;
+  showDays: number;
+  contentFooter: Array<string>;
+  textHelpEn: Array<string>;
+  textHelpRu: Array<string>;
+  textHelpBe: Array<string>;
   listLanguage: Array<string>;
   listScale: Array<string>;
   constructor() {
     this.listScale = ['°F', '°C'];
     this.listLanguage = ['en', 'ru', 'be'];
     this.textSpeak = 'Minsk';
-    this.textFooter = 'Minsk';
-    this.textHelp = ['Incorrect data', 'Search city', 'Search'];
-    this.controls = new Controls(this.doChangesCityFromSearch.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.listLanguage, this.listScale, this.textSpeak, this.textHelp);
+    this.contentFooter = [];
+    this.textHelpBe = ['Інфармацыя', 'Спіс галасавых каманд:', `"Прырода" -  Запусціць галасавое апавяшчэнне`, '"Плюс" - Павелічэнне гучнасці', '"Мінус" - Паменшыць гучнасць', 'Дадатковы функцыянал:', 'Бегавая дарожка з больш падрабязным прагнозам на 3 дні'];
+    this.textHelpRu = ['Информация', 'Список голосовых команд:', '"Природа" - Запустить голосовое уведомление', '"Плюс" - Увеличить громкость', '"Минус" - Уменьшить громкость', 'Дополнительный функционал:', 'Бегущая строка с более подробным прогнозом на 3 дня'];
+    this.textHelpEn = ['Information', 'List of voice commands:', '"Nature" - Run voice notification', '"Plus" - Increase the volume', '"Minus" - Decrease the volume', 'Additional functionality:', 'ticker with a more detailed forecast for 3 days'];
+    this.controls = new Controls(this.doChangesCityFromSearch.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.doMessage.bind(this), this.listLanguage, this.listScale, this.textSpeak, this.textHelpEn);
     this.weather = new Weather(this.doChangesCityFromSearch.bind(this));
     this.map = new Map();
+    this.message = new Message(this.textHelpEn);
     this.KEYIMAGEAPI = 'GZ3T-OqnbT6kW0m8CccKw-ucz4MaeTsJ29r2rKflNoQ';
     this.KEYCURRENT = '20fe2091eb094bb1890cccc4ec32592f';
     this.KEYFORECAST = '324abe064a5d4a98a54f513199af142b';
@@ -81,6 +90,9 @@ class App {
     this.textLangBe = ['Няслушныя дадзеныя', 'Знайсцi горад', 'Пошук'];
     this.textLangRu = ['Неверные данные', 'Найти город', 'Поиск'];
     this.city = 'Minsk';
+    this.timesDay = 'night';
+    this.weatherDescription = 'rain';
+    this.showDays = 4;
   }
 
 
@@ -93,7 +105,7 @@ class App {
     }
     this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2)));
     this.root.append(await this.getMain());
-    this.root.append(getFooter());
+    this.root.append(getFooter(this.contentFooter));
     await this.doChangeBackground();
     this.spinnerOff();
 
@@ -131,23 +143,29 @@ class App {
     this.spinnerOff();
   }
 
+  public doMessage(): void {
+    this.message.openMessage();
+  }
+
   private async getMain(): Promise<HTMLDivElement> {
     this.city = await this.getMyGeolocation();
     const main = document.createElement('div');
     main.classList.add('main-container');
     const forecast: CityForecast[] = [];
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
-    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
+    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
     try {
       let requests = [fetch(urlCurrent), fetch(urlForecast)];
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map(r => r.json()));
-      const days = getWeekDays(data[1].timezone);
+      const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
+      console.log(daysWeek);
       data[1].data.forEach((element, index) => {
-        if (index !== 0) {
-          forecast.push(this.getInfoForecast(days[index - 1], element));
+        if (index !== 0 && index < this.showDays) {
+          forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
         }
       });
+      this.getInfoFooterContent(daysWeek, data[1]);
       main.append(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, this.city));
       main.append(await this.map.render(this.LAT, this.LNG, localStorage.language.substr(1, 2)));
     } catch (error) {
@@ -160,17 +178,19 @@ class App {
     this.city = await this.getGeolocationCity(this.city);
     const forecast: CityForecast[] = [];
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
-    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=4&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
+    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
     try {
       let requests = [fetch(urlCurrent), fetch(urlForecast)];
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map(r => r.json()));
-      const days = getWeekDays(data[1].timezone);
+      const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
       data[1].data.forEach((element, index) => {
         if (index !== 0) {
-          forecast.push(this.getInfoForecast(days[index - 1], element));
+          forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
         }
       });
+      this.getInfoFooterContent(daysWeek, data[1]);
+      updateFooter(this.contentFooter);
       this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
     } catch (error) {
       console.log('Error', error);
@@ -180,6 +200,7 @@ class App {
   private getInfoCurrent(data: any): CityInfoCurrent {
     switch (localStorage.language.substr(1, 2)) {
       case 'be': {
+        this.message.updateMessage(this.textHelpBe);
         const objBe: CityInfoCurrent = {
           temp: data.temp.toFixed(),
           app_temp: `АДЧУВАЕЦЦА ЯК: ${data.app_temp.toFixed()} °`,
@@ -192,6 +213,7 @@ class App {
         return objBe;
       }
       case 'ru': {
+        this.message.updateMessage(this.textHelpRu);
         const objRu: CityInfoCurrent = {
           temp: data.temp.toFixed(),
           app_temp: `ОЩУЩАЕТСЯ КАК: ${data.app_temp.toFixed()} °`,
@@ -204,6 +226,7 @@ class App {
         return objRu;
       }
       default: {
+        this.message.updateMessage(this.textHelpEn);
         const objEn: CityInfoCurrent = {
           temp: data.temp.toFixed(),
           app_temp: `FEELS LIKE: ${data.app_temp.toFixed()} °`,
@@ -219,36 +242,60 @@ class App {
   }
 
   private getInfoForecast(day: string, data: any): CityForecast {
+    const obj: CityForecast = {
+      datetime: day,
+      temp: data.temp.toFixed(),
+      icon: `../assets/icon/${data.weather.icon}.svg`,
+    }
+    return obj;
+  }
+
+  private getInfoFooterContent(days: Array<string>, data: any): void {
+    console.log(days);
+    console.log(data.data);
+    this.contentFooter = [];
     switch (localStorage.language.substr(1, 2)) {
       case 'be': {
-        const objBe: CityForecast = {
-          temp: data.temp.toFixed(),
-          datetime: day,
-          icon: `../assets/icon/${data.weather.icon}.svg`,
-        }
-        return objBe;
+        days.forEach((element, index) => {
+          if (index < days.length - 1) {
+            this.contentFooter.push(`${element}:`);
+            this.contentFooter.push(`${data.data[index + 1].low_temp}°  -  ${data.data[index + 1].high_temp}°`);
+            this.contentFooter.push(`${data.data[index + 1].weather.description}`);
+            this.contentFooter.push(`Вецер: ${data.data[index + 1].wind_cdir_full} -  ${data.data[index + 1].wind_spd.toFixed()} м/с`);
+            this.contentFooter.push(`Вільготнасць: ${data.data[index + 1].rh}%`);
+          }
+        });
+        break;
       }
       case 'ru': {
-        const objRu: CityForecast = {
-          datetime: day,
-          temp: data.temp.toFixed(),
-          icon: `../assets/icon/${data.weather.icon}.svg`,
-        }
-        return objRu;
+        days.forEach((element, index) => {
+          if (index < days.length - 1) {
+            this.contentFooter.push(`${element}:`);
+            this.contentFooter.push(`${data.data[index + 1].low_temp}°  -  ${data.data[index + 1].high_temp}°`);
+            this.contentFooter.push(`${data.data[index + 1].weather.description}`);
+            this.contentFooter.push(`Ветер: ${data.data[index + 1].wind_cdir_full} -  ${data.data[index + 1].wind_spd.toFixed()} м/с`);
+            this.contentFooter.push(`Влажность: ${data.data[index + 1].rh}%`);
+          }
+        });
+        break;
       }
       default: {
-        const objEn: CityForecast = {
-          datetime: day,
-          temp: data.temp.toFixed(),
-          icon: `../assets/icon/${data.weather.icon}.svg`,
-        }
-        return objEn;
+        days.forEach((element, index) => {
+          if (index < days.length - 1) {
+            this.contentFooter.push(`${element}:`);
+            this.contentFooter.push(`${data.data[index + 1].low_temp}°  -  ${data.data[index + 1].high_temp}°`);
+            this.contentFooter.push(`${data.data[index + 1].weather.description}`);
+            this.contentFooter.push(`Wind: ${data.data[index + 1].wind_cdir_full} -  ${data.data[index + 1].wind_spd.toFixed()} м/s`);
+            this.contentFooter.push(`Humidity: ${data.data[index + 1].rh}%`);
+          }
+        });
       }
     }
+    console.log(this.contentFooter);
   }
 
   private async doChangeBackground(): Promise<void> {
-    const words = `nature,day,rain`;
+    const words = `nature,${this.timesDay},${this.weatherDescription}`;
     const url = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
     try {
       const res = await fetch(url);
@@ -256,6 +303,7 @@ class App {
       await this.addImageProcess(data.urls.full);
     } catch (error) {
       document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg2.png);`;
+      console.log('Error', error);
     }
   }
 
@@ -287,7 +335,7 @@ class App {
   }
   private initMessage(): void {
     const body = document.querySelector('body')!;
-    body.prepend(getMessage(this.textHelp));
+    body.prepend(this.message.render());
   }
 
   private async getMyGeolocation(): Promise<string> {

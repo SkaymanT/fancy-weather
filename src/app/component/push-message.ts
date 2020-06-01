@@ -8,6 +8,7 @@ export default class Message {
 
   public render(): HTMLDivElement {
     this.messageContainer.classList.add('message-container');
+    this.messageContainer.classList.add('open');
     let message = document.createElement('div');
     message.classList.add('message');
 
@@ -77,16 +78,6 @@ export default class Message {
 
   public updateMessage(content): void {
     this.content = content;
-    this.messageContainer.querySelector('.info-header').innerHTML = content[0];
-    this.messageContainer.querySelectorAll('.info-paragraph')[0].innerHTML = content[1];
-    this.messageContainer.querySelectorAll('.info-paragraph')[1].innerHTML = content[5];
-    this.messageContainer.querySelectorAll('.info-text').forEach((element, index) => {
-      if (index !== 3) {
-        element.innerHTML = this.content[index + 2];
-      } else {
-        element.innerHTML = this.content[6];
-      }
-    });
   }
 
   private handlerClick(event): void {

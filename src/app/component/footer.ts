@@ -1,15 +1,25 @@
-export function getFooter(): HTMLDivElement {
+export function getFooter(content: Array<string>): HTMLDivElement {
     let footer = document.createElement('div');
     footer.classList.add('footer-container');
-    let keyValue = `<div class="ticker"><p class="ticker__item"></p><p class="ticker__item">Панядзелак :</p><p class="ticker__item">7° - 15°</p><p class="ticker__item">Невялікая воблачнасць на працягу ўсяго дня</p><p class="ticker__item">Вецер: 6 м/с</p><p class="ticker__item">Вільготнасць: 51%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Аўторак :</p><p class="ticker__item">10° - 15°</p><p class="ticker__item">Дождж пачынаецца днём</p><p class="ticker__item">Вецер: 7 м/с</p><p class="ticker__item">Вільготнасць: 65%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Серада :</p><p class="ticker__item">9° - 18°</p><p class="ticker__item">Невялікі дождж раніцай</p><p class="ticker__item">Вецер: 4 м/с</p><p class="ticker__item">Вільготнасць: 66%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Чацвер :</p><p class="ticker__item">9° - 17°</p><p class="ticker__item">Магчымы невялікі дождж ўвечары</p><p class="ticker__item">Вецер: 2 м/с</p><p class="ticker__item">Вільготнасць: 70%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Пятніца :</p><p class="ticker__item">12° - 20°</p><p class="ticker__item">Ясна на працягу ўсяго дня</p><p class="ticker__item">Вецер: 4 м/с</p><p class="ticker__item">Вільготнасць: 63%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Субота :</p><p class="ticker__item">12° - 22°</p><p class="ticker__item">Невялікая воблачнасць на працягу ўсяго дня</p><p class="ticker__item">Вецер: 5 м/с</p><p class="ticker__item">Вільготнасць: 54%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Нядзеля :</p><p class="ticker__item">13° - 23°</p><p class="ticker__item">Невялікі дождж ноччу</p><p class="ticker__item">Вецер: 5 м/с</p><p class="ticker__item">Вільготнасць: 50%</p><p class="ticker__item"></p></div>`;
-    footer.insertAdjacentHTML('beforeend', keyValue);
+
+    let ticker = document.createElement('div');
+    ticker.classList.add('ticker');
+    content.forEach((element, index) => {
+        let tickerItem = document.createElement('p');
+        tickerItem.classList.add('ticker__item');
+        tickerItem.innerText = element;
+        ticker.append(tickerItem);
+    });
+
+    footer.append(ticker);
+
     return footer;
 }
 
-export function updateFooter(): HTMLDivElement {
-    let footer = document.createElement('div');
-    footer.classList.add('footer-container');
-    let keyValue = `<div class="ticker"><p class="ticker__item"></p><p class="ticker__item">Панядзелак :</p><p class="ticker__item">7° - 15°</p><p class="ticker__item">Невялікая воблачнасць на працягу ўсяго дня</p><p class="ticker__item">Вецер: 6 м/с</p><p class="ticker__item">Вільготнасць: 51%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Аўторак :</p><p class="ticker__item">10° - 15°</p><p class="ticker__item">Дождж пачынаецца днём</p><p class="ticker__item">Вецер: 7 м/с</p><p class="ticker__item">Вільготнасць: 65%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Серада :</p><p class="ticker__item">9° - 18°</p><p class="ticker__item">Невялікі дождж раніцай</p><p class="ticker__item">Вецер: 4 м/с</p><p class="ticker__item">Вільготнасць: 66%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Чацвер :</p><p class="ticker__item">9° - 17°</p><p class="ticker__item">Магчымы невялікі дождж ўвечары</p><p class="ticker__item">Вецер: 2 м/с</p><p class="ticker__item">Вільготнасць: 70%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Пятніца :</p><p class="ticker__item">12° - 20°</p><p class="ticker__item">Ясна на працягу ўсяго дня</p><p class="ticker__item">Вецер: 4 м/с</p><p class="ticker__item">Вільготнасць: 63%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Субота :</p><p class="ticker__item">12° - 22°</p><p class="ticker__item">Невялікая воблачнасць на працягу ўсяго дня</p><p class="ticker__item">Вецер: 5 м/с</p><p class="ticker__item">Вільготнасць: 54%</p><p class="ticker__item"></p><p class="ticker__item"></p><p class="ticker__item">Нядзеля :</p><p class="ticker__item">13° - 23°</p><p class="ticker__item">Невялікі дождж ноччу</p><p class="ticker__item">Вецер: 5 м/с</p><p class="ticker__item">Вільготнасць: 50%</p><p class="ticker__item"></p></div>`;
-    footer.insertAdjacentHTML('beforeend', keyValue);
-    return footer;
+export function updateFooter(content: Array<string>): void {
+    let footer = document.querySelector('.footer-container');
+    let tickers = footer.querySelectorAll('.ticker__item');
+    tickers.forEach((element, index) => {
+        element.innerHTML = content[index];
+    });
 }
