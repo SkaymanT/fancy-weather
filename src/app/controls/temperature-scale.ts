@@ -30,7 +30,7 @@ export default class TemperatureScale {
     }
   }
   private isClickButtonScale(event): boolean {
-    return event.target.classList.contains('button--c') || event.target.classList.contains('button--f');
+    return (event.target.classList.contains('button--c') || event.target.classList.contains('button--f')) && event.target.classList.contains('inactive');
   }
 
   async clickButtonScale(event): Promise<void> {

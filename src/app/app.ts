@@ -69,7 +69,7 @@ class App {
   constructor() {
     this.listScale = ['°F', '°C'];
     this.listLanguage = ['en', 'ru', 'be'];
-    this.textSpeak = 'Минск, Беларусь, небольшой дождь, ↵       12°C,         ощущается как 5°C,         ветер 9 м/с,         влажность 62%';
+    this.textSpeak = 'ERROR';
     this.contentFooter = [];
     this.textHelpBe = ['Інфармацыя', 'Спіс галасавых каманд:', `"Прырода" -  Запусціць галасавое апавяшчэнне`, '"Плюс" - Павелічэнне гучнасці', '"Мінус" - Паменшыць гучнасць', 'Дадатковы функцыянал:', 'Бегавая дарожка з больш падрабязным прагнозам на тыдзень'];
     this.textHelpRu = ['Информация', 'Список голосовых команд:', '"Природа" - Запустить голосовое уведомление', '"Плюс" - Увеличить громкость', '"Минус" - Уменьшить громкость', 'Дополнительный функционал:', 'Бегущая строка с более подробным прогнозом на неделю'];
@@ -172,6 +172,7 @@ class App {
       this.getInfoFooterContent(daysWeek, data[1]);
       main.append(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, this.city));
       main.append(await this.map.render(this.LAT, this.LNG, localStorage.language.substr(1, 2)));
+      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     } catch (error) {
       console.log('Error', error);
     }
@@ -180,7 +181,6 @@ class App {
 
   private async doChangesWeather(): Promise<void> {
     this.city = await this.getGeolocationCity(this.city);
-    console.log(this.city);
     const forecast: CityForecast[] = [];
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
     const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
@@ -190,7 +190,7 @@ class App {
       const data = await Promise.all(responses.map(r => r.json()));
       const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
       data[1].data.forEach((element, index) => {
-        if (index !== 0) {
+        if (index !== 0 && index < this.showDays) {
           forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
         }
       });
@@ -249,18 +249,20 @@ class App {
 
   private getInfoSpeak(data: any): void {
     this.textSpeak = '';
-    console.log('change');
     switch (localStorage.language.substr(1, 2)) {
       case 'be': {
-        this.textSpeak = `${this.city}, ${data.weather.description}, ${data.temp.toFixed()} адчуваецца як: ${data.app_temp.toFixed()}, вецер: ${data.wind_spd.toFixed()} м/с, вільготнасць: ${data.rh}%`;
+        this.textSpeak = `${this.city}, ${data.weather.description}, 
+        тэмпература ${data.temp.toFixed()} ${localStorage.scale.substr(1, 2)},  адчуваецца як: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}, вецер: ${data.wind_spd.toFixed()} м/с, вільготнасць: ${data.rh}%`;
         break;
       }
       case 'ru': {
-        this.textSpeak = `${this.city}, ${data.weather.description}, ${data.temp.toFixed()} ощущается как: ${data.app_temp.toFixed()}, ветер: ${data.wind_spd.toFixed()} м/с, влажность: ${data.rh}%`;
+        this.textSpeak = `${this.city}, ${data.weather.description}, 
+        температура ${data.temp.toFixed()} ${localStorage.scale.substr(1, 2)},  ощущается как: ${data.app_temp.toFixed()}${localStorage.scale.substr(1, 2)}, ветер: ${data.wind_spd.toFixed()} м/с, влажность: ${data.rh}%`;
         break;
       }
       default: {
-        this.textSpeak = `${this.city}, ${data.weather.description}, ${data.temp.toFixed()} feels like: ${data.app_temp.toFixed()}, wind: ${data.wind_spd.toFixed()} м/с, humidity: ${data.rh}%`;
+        this.textSpeak = `${this.city}, ${data.weather.description}, 
+        temperature ${data.temp.toFixed()} ${localStorage.scale.substr(1, 2)},  feels like: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}, wind: ${data.wind_spd.toFixed()} м/с, humidity: ${data.rh}%`;
       }
     }
   }
@@ -281,7 +283,7 @@ class App {
         days.forEach((element, index) => {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
-            this.contentFooter.push(`${data.data[index + 1].low_temp}°  -  ${data.data[index + 1].high_temp}°`);
+            this.contentFooter.push(`${data.data[index + 1].low_temp}  -  ${data.data[index + 1].high_temp} ${localStorage.scale.substr(1, 2)}`);
             this.contentFooter.push(`${data.data[index + 1].weather.description}`);
             this.contentFooter.push(`Вецер: ${data.data[index + 1].wind_cdir_full} -  ${data.data[index + 1].wind_spd.toFixed()} м/с`);
             this.contentFooter.push(`Вільготнасць: ${data.data[index + 1].rh}%`);
@@ -293,7 +295,7 @@ class App {
         days.forEach((element, index) => {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
-            this.contentFooter.push(`${data.data[index + 1].low_temp}°  -  ${data.data[index + 1].high_temp}°`);
+            this.contentFooter.push(`${data.data[index + 1].low_temp}  -  ${data.data[index + 1].high_temp} ${localStorage.scale.substr(1, 2)}`);
             this.contentFooter.push(`${data.data[index + 1].weather.description}`);
             this.contentFooter.push(`Ветер: ${data.data[index + 1].wind_cdir_full} -  ${data.data[index + 1].wind_spd.toFixed()} м/с`);
             this.contentFooter.push(`Влажность: ${data.data[index + 1].rh}%`);
@@ -305,7 +307,7 @@ class App {
         days.forEach((element, index) => {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
-            this.contentFooter.push(`${data.data[index + 1].low_temp}°  -  ${data.data[index + 1].high_temp}°`);
+            this.contentFooter.push(`${data.data[index + 1].low_temp}  -  ${data.data[index + 1].high_temp} ${localStorage.scale.substr(1, 2)}`);
             this.contentFooter.push(`${data.data[index + 1].weather.description}`);
             this.contentFooter.push(`Wind: ${data.data[index + 1].wind_cdir_full} -  ${data.data[index + 1].wind_spd.toFixed()} м/s`);
             this.contentFooter.push(`Humidity: ${data.data[index + 1].rh}%`);

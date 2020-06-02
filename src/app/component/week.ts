@@ -10,18 +10,19 @@ export function getDate(timezone: string): string {
     let MonthArrayBe = new Array('cтудзеня', 'лютага', 'сакавiка', 'красавiка', 'мая', 'червеня', 'лiпеня', 'жнiвня', 'верасня', 'кастрычнiка', 'лiстапада', 'снежня');
     const hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours();
     const minutes = (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes();
+    const seconds = (date.getSeconds() < 10) ? '0' + date.getSeconds() : date.getSeconds();
     if (localStorage.language) {
         if (localStorage.language.substr(1, 2) === 'en') {
-            return daysEn[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayEn[date.getMonth()] + ' ' + hours + ':' + minutes;
+            return daysEn[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayEn[date.getMonth()] + ' ' + hours + ':' + minutes + ':' + seconds;
         }
         if (localStorage.language.substr(1, 2) === 'ru') {
-            return daysRu[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayRu[date.getMonth()] + ' ' + hours + ':' + minutes;
+            return daysRu[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayRu[date.getMonth()] + ' ' + hours + ':' + minutes + ':' + seconds;;
         }
         if (localStorage.language.substr(1, 2) === 'be') {
-            return daysBe[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayBe[date.getMonth()] + ' ' + hours + ':' + minutes;
+            return daysBe[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayBe[date.getMonth()] + ' ' + hours + ':' + minutes + ':' + seconds;;
         }
     } else {
-        return daysEn[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayEn[date.getMonth()] + ' ' + hours + ':' + minutes;
+        return daysEn[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayEn[date.getMonth()] + ' ' + hours + ':' + minutes + ':' + seconds;;
     }
 }
 
