@@ -17,43 +17,24 @@ export default class Micro {
   }
 
   public onMicro(input): void {
-    if (this.language === 'ru') {
-      document.querySelector('.button-micro').classList.add('active');
-      // this.recognition.lang = 'en-US'; ru-RU be - надо ошибку писать
-      this.recognition.start();
-      let word = '';
-      this.recognition.addEventListener('result', e => {
-        const transcript = Array.from(e.results)
-          .map(result => result[0])
-          .map(result => result.transcript)
-          .join('');
+    document.querySelector('.button-micro').classList.add('active');
+    // this.recognition.lang = 'en-US'; ru-RU be - надо ошибку писать
+    this.recognition.start();
+    let word = '';
+    this.recognition.addEventListener('result', e => {
+      const transcript = Array.from(e.results)
+        .map(result => result[0])
+        .map(result => result.transcript)
+        .join('');
 
-        word = transcript.toLowerCase();
-        input.value = word;
+      word = transcript.toLowerCase();
+      input.value = word;
 
-        switch (word) {
-          case 'природа': {
-            console.log('природа');
-            break;
-          }
-          case 'плюс': {
-            console.log('плюс');
-            break;
-          }
-          case 'минус': {
-            console.log('минус');
-            break;
-          }
-          default: {
-            console.log('поиск');
-            this.getSearch(word);
-          }
-        }
+      this.getSearch(word);
 
-      });
+    });
 
-      this.recognition.addEventListener('end', this.recognition.start);
-    }
+    this.recognition.addEventListener('end', this.recognition.start);
   }
 
   public checkedisOnMicro(searchContainer: HTMLDivElement): boolean {

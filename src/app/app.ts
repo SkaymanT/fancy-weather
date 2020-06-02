@@ -116,11 +116,61 @@ class App {
   public async doChangesCityFromSearch(textCity): Promise<void> {
     this.city = textCity;
     this.spinnerOn();
-    await this.doChangesWeather();
-    this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
-    this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
+    if (this.checkKeyword(textCity)) {
+      await this.doChangesWeather();
+      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
+      this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
+    }
     this.spinnerOff();
   }
+
+  private checkKeyword(textCity): boolean {
+    if (localStorage.language.substr(1, 2) == 'en') {
+      switch (textCity) {
+        case 'природа': {
+          console.log('природа1');
+          return false;
+        }
+        case 'плюс': {
+          console.log('плюс');
+          return false;
+        }
+        case 'минус': {
+          console.log('минус');
+          return false;
+        }
+        default: {
+          console.log('поиск');
+          return true;
+        }
+      }
+    }
+    if (localStorage.language.substr(1, 2) == 'ru') {
+      switch (textCity) {
+        case 'природа': {
+          console.log('природа2');
+          return false;
+        }
+        case 'плюс': {
+          console.log('плюс2');
+          return false;
+        }
+        case 'минус': {
+          console.log('минус2');
+          return false;
+        }
+        default: {
+          console.log('поиск2');
+          return true;
+        }
+      }
+    }
+    if (localStorage.language.substr(1, 2) == 'be') {
+      console.log('message');
+    }
+  }
+
+
 
   public async doChangeLanguage(language): Promise<void> {
     if (!localStorage.scale) {
@@ -209,7 +259,7 @@ class App {
         this.message.updateMessage(this.textHelpBe);
         const objBe: CityInfoCurrent = {
           temp: data.temp.toFixed(),
-          app_temp: `АДЧУВАЕЦЦА ЯК: ${data.app_temp.toFixed()} °`,
+          app_temp: `АДЧУВАЕЦЦА ЯК: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
           datetime: getDate(data.timezone),
           description: data.weather.description,
@@ -222,7 +272,7 @@ class App {
         this.message.updateMessage(this.textHelpRu);
         const objRu: CityInfoCurrent = {
           temp: data.temp.toFixed(),
-          app_temp: `ОЩУЩАЕТСЯ КАК: ${data.app_temp.toFixed()} °`,
+          app_temp: `ОЩУЩАЕТСЯ КАК: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
           datetime: getDate(data.timezone),
           description: data.weather.description,
@@ -235,7 +285,7 @@ class App {
         this.message.updateMessage(this.textHelpEn);
         const objEn: CityInfoCurrent = {
           temp: data.temp.toFixed(),
-          app_temp: `FEELS LIKE: ${data.app_temp.toFixed()} °`,
+          app_temp: `FEELS LIKE: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
           datetime: getDate(data.timezone),
           description: data.weather.description,
