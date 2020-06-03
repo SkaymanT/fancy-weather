@@ -83,8 +83,8 @@ class App {
     this.notify = new Notify();
     this.message = new Message(this.textHelpEn);
     this.KEYIMAGEAPI = 'GZ3T-OqnbT6kW0m8CccKw-ucz4MaeTsJ29r2rKflNoQ';
-    this.KEYCURRENT = '3eb177f99eeb4f10bd3d06120158fd5c'; //20fe2091eb094bb1890cccc4ec32592f // 3eb177f99eeb4f10bd3d06120158fd5c
-    this.KEYFORECAST = '3eb177f99eeb4f10bd3d06120158fd5c'; //324abe064a5d4a98a54f513199af142b
+    this.KEYCURRENT = '20fe2091eb094bb1890cccc4ec32592f';
+    this.KEYFORECAST = '324abe064a5d4a98a54f513199af142b';
     this.KEYGEOlOCATION = 'f7edfcc5ad81b0';
     this.KEYGEOCORDING = '57913d93c3a94107bcf4c29eb5f997c7';
     this.LAT = '55.752';
@@ -511,7 +511,6 @@ class App {
       switch (textCity) {
         case this.keyWords[1]['key']: {
           this.controls.search.clearSearch();
-          console.log(this.volume);
           this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
           return false;
         }
