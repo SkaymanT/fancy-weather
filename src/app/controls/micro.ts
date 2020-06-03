@@ -34,7 +34,7 @@ export default class Micro {
     this.recognition.addEventListener('end', this.recognition.start);
   }
 
-  public checkedisOnMicro(searchContainer: HTMLDivElement): boolean {
+  public checkedisOnMicro(searchContainer: HTMLFormElement): boolean {
     return !searchContainer.querySelector('.button-micro').classList.contains('active')
   }
 

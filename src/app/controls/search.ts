@@ -1,7 +1,7 @@
 import Micro from './micro';
 export default class Search {
   doChanges: Function;
-  searchContainer: HTMLDivElement;
+  searchContainer: HTMLFormElement;
   micro: Micro;
   placeholder: string;
   incorrectData: string;
@@ -12,8 +12,8 @@ export default class Search {
     this.micro = new Micro();
   }
 
-  public render(text: Array<string>): HTMLDivElement {
-    this.searchContainer = document.createElement('div');
+  public render(text: Array<string>): HTMLFormElement {
+    this.searchContainer = document.createElement('form');
     this.searchContainer.classList.add('search-container');
     this.changeText(text);
     this.searchContainer.append(this.getInput());
@@ -69,34 +69,10 @@ export default class Search {
   }
 
   private clickButtonSearch(): void {
+    event.preventDefault();
     let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
     let value = inputElement.value;
-    if (!this.validationInput(value)) {
-      return;
-    } else {
-      this.doChanges(value);
-    }
-  }
-
-  private validationInput(input): boolean {
-    let regLang = /[0-9 ]/i;
-    let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
-    if (input == '') {
-      inputElement.placeholder = this.incorrectData;
-      inputElement.classList.add('search-field-error');
-      return false;
-    }
-    if (regLang.test(input)) {
-      inputElement.placeholder = this.incorrectData;
-      inputElement.classList.add('earch-field-error');
-      inputElement.value = '';
-      return false;
-    } else {
-      inputElement.classList.remove('search-field-error');
-      inputElement.placeholder = this.placeholder;
-      inputElement.value = '';
-      return true;
-    }
+    this.doChanges(value);
   }
 
   private isClickButtonMicro(event): boolean {
@@ -114,7 +90,7 @@ export default class Search {
   private getInput(): HTMLInputElement {
     const inputContainer = document.createElement('input');
     inputContainer.classList.add('search-input');
-    inputContainer.type = 'search';
+    inputContainer.type = 'text';
     inputContainer.name = 'search-city';
     inputContainer.placeholder = this.placeholder;
     inputContainer.required = true;
@@ -122,11 +98,12 @@ export default class Search {
   }
 
   private getSearch(): HTMLButtonElement {
-    const buttonMicro = document.createElement('button');
-    buttonMicro.classList.add('button');
-    buttonMicro.classList.add('search-input__button');
-    buttonMicro.innerText = this.nameButton;
-    return buttonMicro;
+    const buttonSearch = document.createElement('button');
+    buttonSearch.classList.add('button');
+    buttonSearch.classList.add('search-input__button');
+    buttonSearch.type = 'button';
+    buttonSearch.innerText = this.nameButton;
+    return buttonSearch;
   }
 
 }

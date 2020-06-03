@@ -119,61 +119,20 @@ class App {
   }
 
   public async doChangesCityFromSearch(textCity): Promise<void> {
+    if (textCity === '') {
+      this.notify.openMessage(`not entered city`, 'error');
+      return;
+    }
     this.city = textCity;
     this.spinnerOn();
-    if (this.checkKeyword(textCity)) {
-      await this.doChangesWeather();
-      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
-      this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
+    if (this.checkKeywordFromMicro(textCity)) {
+      let result = await this.doChangesWeather();
+      if (result !== undefined) {
+        this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
+        this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
+      }
     }
     this.spinnerOff();
-  }
-
-  private checkKeyword(textCity): boolean {
-    if (localStorage.language.substr(1, 2) == this.listLanguage[0]) {
-      switch (textCity) {
-        case this.keyWords[0]['key']: {
-          this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
-          return false;
-        }
-        case this.keyWords[0]['increase']: {
-          this.increaseVolume();
-          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
-          return false;
-        }
-        case this.keyWords[0]['decrease']: {
-          this.decreaseVolume();
-          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
-          return false;
-        }
-        default: {
-          console.log('search');
-          return true;
-        }
-      }
-    }
-    if (localStorage.language.substr(1, 2) == this.listLanguage[1] || localStorage.language.substr(1, 2) == this.listLanguage[2]) {
-      switch (textCity) {
-        case this.keyWords[1]['key']: {
-          this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
-          return false;
-        }
-        case this.keyWords[1]['increase']: {
-          this.increaseVolume();
-          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
-          return false;
-        }
-        case this.keyWords[1]['decrease']: {
-          this.decreaseVolume();
-          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
-          return false;
-        }
-        default: {
-          console.log('поиск');
-          return true;
-        }
-      }
-    }
   }
 
   private increaseVolume(): void {
@@ -241,17 +200,22 @@ class App {
       main.append(await this.map.render(this.LAT, this.LNG, localStorage.language.substr(1, 2)));
       this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     } catch (error) {
+      this.notify.openMessage(`no connect`, 'error');
       console.log('Error', error);
     }
     return main;
   }
 
-  private async doChangesWeather(): Promise<void> {
-    this.city = await this.getGeolocationCity(this.city);
-    const forecast: CityForecast[] = [];
-    const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
-    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
+  private async doChangesWeather(): Promise<string> {
     try {
+      let result = await this.getGeolocationCity(this.city);
+      if (result === undefined) {
+        return undefined;
+      }
+      this.city = result;
+      const forecast: CityForecast[] = [];
+      const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
+      const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
       let requests = [fetch(urlCurrent), fetch(urlForecast)];
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map(r => r.json()));
@@ -265,8 +229,10 @@ class App {
       updateFooter(this.contentFooter);
       this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
     } catch (error) {
+      this.notify.openMessage(`Disconnection `, 'error');
       console.log('Error', error);
     }
+    return this.city;
   }
 
   private getInfoCurrent(data: any): CityInfoCurrent {
@@ -445,6 +411,7 @@ class App {
       city = dataGeocoding.results[0].formatted;
       [this.LAT, this.LNG] = [dataGeocoding.results[0].geometry.lat.toString(), dataGeocoding.results[0].geometry.lng.toString()];
     } catch (error) {
+      this.notify.openMessage(`no connect`, 'error');
       console.log('Error', error);
     }
     return city;
@@ -457,10 +424,12 @@ class App {
       const dataGeocoding = await resGeocoding.json();
       city = dataGeocoding.results[0].formatted;
       [this.LAT, this.LNG] = [dataGeocoding.results[0].geometry.lat.toString(), dataGeocoding.results[0].geometry.lng.toString()];
+      return city;
     } catch (error) {
-      console.log('Error', error);
+      this.notify.openMessage(`Нет результатов для '${city}'`, 'error');
+      console.log(error);
+      return undefined;
     }
-    return city;
   }
 
   private getCodeScaleForSearch(): string {
@@ -507,6 +476,51 @@ class App {
       preloader.classList.add('done');
     }
     preloader.classList.add('open');
+  }
+
+  private checkKeywordFromMicro(textCity): boolean {
+    if (localStorage.language.substr(1, 2) == this.listLanguage[0]) {
+      switch (textCity) {
+        case this.keyWords[0]['key']: {
+          this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
+          return false;
+        }
+        case this.keyWords[0]['increase']: {
+          this.increaseVolume();
+          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
+          return false;
+        }
+        case this.keyWords[0]['decrease']: {
+          this.decreaseVolume();
+          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
+          return false;
+        }
+        default: {
+          return true;
+        }
+      }
+    }
+    if (localStorage.language.substr(1, 2) == this.listLanguage[1] || localStorage.language.substr(1, 2) == this.listLanguage[2]) {
+      switch (textCity) {
+        case this.keyWords[1]['key']: {
+          this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
+          return false;
+        }
+        case this.keyWords[1]['increase']: {
+          this.increaseVolume();
+          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
+          return false;
+        }
+        case this.keyWords[1]['decrease']: {
+          this.decreaseVolume();
+          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
+          return false;
+        }
+        default: {
+          return true;
+        }
+      }
+    }
   }
 
 }
