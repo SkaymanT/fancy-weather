@@ -24,7 +24,7 @@ export default class Map {
     console.log('sss1');
     let src = `https://www.google.com/maps/embed/v1/place?q=${lat},${lng}&zoom=11&key=${this.KEYMAPAPI}&language=${language}`;
     await this.addIframeProcess(src);
-    console.log('sss2');
+
     let coordinatesContainer = this.mapContainer.querySelectorAll('.map-container__coordinates>p') as NodeListOf<HTMLParagraphElement>;
     const coordinates = this.updateCoordinates(lat, lng, language);
     coordinatesContainer[0].innerText = coordinates[0];
@@ -39,13 +39,12 @@ export default class Map {
   }
 
   private async addIframeProcess(src): Promise<void> {
-    const iframe = document.createElement("iframe");
+    const iframe = document.createElement('iframe');
     let iframepromise = this.onloadPromise(iframe);
-    console.log('ss112')
+    console.log('ss112');
+    // let mapIframe = this.mapContainer.querySelector('.map-iframe') as HTMLIFrameElement;
+    iframe.src = src;
     await iframepromise;
-    console.log('ss12')
-    let mapIframe = this.mapContainer.querySelector('.map-iframe') as HTMLIFrameElement;
-    mapIframe.src = src;
   }
 
   private async getMap(lat: string, lng: string, language: string): Promise<HTMLDivElement> {

@@ -74,9 +74,9 @@ class App {
     this.listLanguage = ['en', 'ru', 'be'];
     this.textSpeak = 'ERROR';
     this.contentFooter = [];
-    this.textHelpBe = ['Інфармацыя', 'Спіс галасавых каманд:', `"Прырода" -  Запусціць галасавое апавяшчэнне`, '"Плюс" - Павелічэнне гучнасці', '"Мінус" - Паменшыць гучнасць', 'Дадатковы функцыянал:', 'Бегавая дарожка з больш падрабязным прагнозам на тыдзень'];
-    this.textHelpRu = ['Информация', 'Список голосовых команд:', '"Природа" - Запустить голосовое уведомление', '"Плюс" - Увеличить громкость', '"Минус" - Уменьшить громкость', 'Дополнительный функционал:', 'Бегущая строка с более подробным прогнозом на неделю'];
-    this.textHelpEn = ['Information', 'List of voice commands:', '"Nature" - Run voice notification', '"Plus" - Increase the volume', '"Minus" - Decrease the volume', 'Additional functionality:', 'ticker with a more detailed forecast for week'];
+    this.textHelpBe = ['Інфармацыя', 'Спіс галасавых каманд:', `"Прырода" -  Запусціць галасавое апавяшчэнне`, '"Павышэнне" - Павелічэнне гучнасці', '"Паніжэнне" - Паменшыць гучнасць', 'Дадатковы функцыянал:', 'Бегавая дарожка з больш падрабязным прагнозам на тыдзень'];
+    this.textHelpRu = ['Информация', 'Список голосовых команд:', '"Природа" - Запустить голосовое уведомление', '"Повышение" - Увеличить громкость', '"Понижение" - Уменьшить громкость', 'Дополнительный функционал:', 'Бегущая строка с более подробным прогнозом на неделю'];
+    this.textHelpEn = ['Information', 'List of voice commands:', '"Nature" - Run voice notification', '"Increase" - Increase the volume', '"Decrease" - Decrease the volume', 'Additional functionality:', 'ticker with a more detailed forecast for week'];
     this.controls = new Controls(this.doChangesCityFromSearch.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.doMessage.bind(this), this.listLanguage, this.listScale, this.textSpeak, this.textHelpEn);
     this.weather = new Weather(this.doChangesCityFromSearch.bind(this));
     this.map = new Map();
@@ -99,7 +99,7 @@ class App {
     this.weatherDescription = 'rain';
     this.showDays = 4;
     this.volume = 1;
-    this.keyWords = [{ language: 'en', key: 'nature', increase: 'plus', decrease: 'minus' }, { language: 'ru', key: 'природа', increase: 'плюс', decrease: 'минус' }, { language: 'be', key: 'прырода', increase: 'плюс', decrease: 'мiнус' }];
+    this.keyWords = [{ language: 'en', key: 'nature', increase: 'increase', decrease: 'decrease' }, { language: 'ru', key: 'природа', increase: 'повышение', decrease: 'понижение' }, { language: 'be', key: 'прырода', increase: 'павышэнне', decrease: 'паніжэнне' }];
   }
 
 
@@ -123,9 +123,9 @@ class App {
       this.notify.openMessage(`not entered city`, 'error');
       return;
     }
-    this.city = textCity;
     this.spinnerOn();
     if (this.checkKeywordFromMicro(textCity)) {
+      this.city = textCity;
       let result = await this.doChangesWeather();
       if (result !== undefined) {
         this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
@@ -138,12 +138,14 @@ class App {
   private increaseVolume(): void {
     if (this.volume >= 0 && this.volume < 1) {
       this.volume += 0.1;
+      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     }
   }
 
   private decreaseVolume(): void {
     if (this.volume > 0 && this.volume <= 1) {
       this.volume -= 0.1;
+      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     }
   }
 
@@ -482,17 +484,20 @@ class App {
     if (localStorage.language.substr(1, 2) == this.listLanguage[0]) {
       switch (textCity) {
         case this.keyWords[0]['key']: {
+          this.controls.search.clearSearch();
           this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
           return false;
         }
         case this.keyWords[0]['increase']: {
+          this.controls.search.clearSearch();
           this.increaseVolume();
-          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
+          this.notify.openMessage(`volume: ${(this.volume * 100).toFixed()}%  `, 'info');
           return false;
         }
         case this.keyWords[0]['decrease']: {
+          this.controls.search.clearSearch();
           this.decreaseVolume();
-          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
+          this.notify.openMessage(`volume: ${(this.volume * 100).toFixed()}%  `, 'info');
           return false;
         }
         default: {
@@ -503,17 +508,21 @@ class App {
     if (localStorage.language.substr(1, 2) == this.listLanguage[1] || localStorage.language.substr(1, 2) == this.listLanguage[2]) {
       switch (textCity) {
         case this.keyWords[1]['key']: {
+          this.controls.search.clearSearch();
+          console.log(this.volume);
           this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
           return false;
         }
         case this.keyWords[1]['increase']: {
+          this.controls.search.clearSearch();
           this.increaseVolume();
-          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
+          this.notify.openMessage(`Громкость: ${(this.volume * 100).toFixed()}%  `, 'info');
           return false;
         }
         case this.keyWords[1]['decrease']: {
+          this.controls.search.clearSearch();
           this.decreaseVolume();
-          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
+          this.notify.openMessage(`Громкость: ${(this.volume * 100).toFixed()}%  `, 'info');
           return false;
         }
         default: {

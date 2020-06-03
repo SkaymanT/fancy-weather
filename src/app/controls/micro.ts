@@ -6,7 +6,6 @@ export default class Micro {
   constructor() {
     const SpeechRecognitionConstructor = window.SpeechRecognition || (<any>window).webkitSpeechRecognition;
     this.recognition = new SpeechRecognitionConstructor();
-    this.language = 'En';
   }
 
   public getMicro(doChanges): HTMLButtonElement {
@@ -17,8 +16,9 @@ export default class Micro {
   }
 
   public onMicro(input): void {
+    const SpeechRecognitionConstructor = window.SpeechRecognition || (<any>window).webkitSpeechRecognition;
+    this.recognition = new SpeechRecognitionConstructor();
     document.querySelector('.button-micro').classList.add('active');
-    // this.recognition.lang = 'en-US'; ru-RU be - надо ошибку писать
     this.recognition.start();
     let word = '';
     this.recognition.addEventListener('result', e => {
@@ -28,13 +28,16 @@ export default class Micro {
         .join('');
       word = transcript.toLowerCase();
       input.value = word;
+      if (word[word.length - 1] === '.') {
+        word = word.substring(0, word.length - 1);
+      }
+      input.value = word;
       this.getSearch(word);
     });
 
-    this.recognition.addEventListener('end', this.recognition.start);
   }
 
-  public checkedisOnMicro(searchContainer: HTMLFormElement): boolean {
+  public checkedisOnMicro(searchContainer: HTMLDivElement): boolean {
     return !searchContainer.querySelector('.button-micro').classList.contains('active')
   }
 

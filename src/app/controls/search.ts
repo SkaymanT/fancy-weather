@@ -1,7 +1,7 @@
 import Micro from './micro';
 export default class Search {
   doChanges: Function;
-  searchContainer: HTMLFormElement;
+  searchContainer: HTMLDivElement;
   micro: Micro;
   placeholder: string;
   incorrectData: string;
@@ -12,12 +12,12 @@ export default class Search {
     this.micro = new Micro();
   }
 
-  public render(text: Array<string>): HTMLFormElement {
-    this.searchContainer = document.createElement('form');
+  public render(text: Array<string>): HTMLDivElement {
+    this.searchContainer = document.createElement('div');
     this.searchContainer.classList.add('search-container');
     this.changeText(text);
     this.searchContainer.append(this.getInput());
-    this.searchContainer.append(this.micro.getMicro(this.clickButtonSearch));
+    this.searchContainer.append(this.micro.getMicro(this.clickButtonSearch.bind(this)));
     this.searchContainer.append(this.getSearch());
     this.searchContainer.addEventListener('click', (event) => this.handlerClick(event));
     this.searchContainer.addEventListener('keydown', (e) => this.handlerClickKeyboard(e));
@@ -30,6 +30,7 @@ export default class Search {
     let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
     let button = this.searchContainer.querySelector('.search-input__button') as HTMLInputElement;
     inputElement.placeholder = this.placeholder;
+    inputElement.textContent = '';
     button.innerText = this.nameButton;
   }
 
