@@ -9,7 +9,7 @@ export default class Search {
 
   constructor(doChanges: Function) {
     this.doChanges = doChanges;
-    this.micro = new Micro(doChanges);
+    this.micro = new Micro();
   }
 
   public render(text: Array<string>): HTMLDivElement {
@@ -17,7 +17,7 @@ export default class Search {
     this.searchContainer.classList.add('search-container');
     this.changeText(text);
     this.searchContainer.append(this.getInput());
-    this.searchContainer.append(this.micro.getMicro());
+    this.searchContainer.append(this.micro.getMicro(this.clickButtonSearch));
     this.searchContainer.append(this.getSearch());
     this.searchContainer.addEventListener('click', (event) => this.handlerClick(event));
     this.searchContainer.addEventListener('keydown', (e) => this.handlerClickKeyboard(e));
@@ -31,6 +31,11 @@ export default class Search {
     let button = this.searchContainer.querySelector('.search-input__button') as HTMLInputElement;
     inputElement.placeholder = this.placeholder;
     button.innerText = this.nameButton;
+  }
+
+  public clearSearch(): void {
+    let inputElement = this.searchContainer.querySelector('.search-input') as HTMLInputElement;
+    inputElement.value = '';
   }
 
   private changeText(text: Array<string>): void {
@@ -88,6 +93,7 @@ export default class Search {
       return false;
     } else {
       inputElement.classList.remove('search-field-error');
+      inputElement.placeholder = this.placeholder;
       inputElement.value = '';
       return true;
     }

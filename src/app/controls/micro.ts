@@ -3,16 +3,16 @@ export default class Micro {
   language: string;
   doChanges: Function;
 
-  constructor(doChanges) {
-    this.doChanges = doChanges;
+  constructor() {
     const SpeechRecognitionConstructor = window.SpeechRecognition || (<any>window).webkitSpeechRecognition;
     this.recognition = new SpeechRecognitionConstructor();
     this.language = 'En';
   }
 
-  public getMicro(): HTMLButtonElement {
+  public getMicro(doChanges): HTMLButtonElement {
     const buttonMicro = document.createElement('button');
     buttonMicro.classList.add('button-micro');
+    this.doChanges = doChanges;
     return buttonMicro;
   }
 

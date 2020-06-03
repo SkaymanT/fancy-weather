@@ -6,26 +6,31 @@ export default class Notify {
   }
 
   public render(): HTMLDivElement {
-    this.notifyContainer.addEventListener('click', (event) => this.handlerClick(event));
     return this.notifyContainer;
   }
 
-  public openMessage(content: string, typeContent: string): void {
+  public async openMessage(content: string, typeContent: string): Promise<void> {
     this.notifyContainer.classList.add('notify');
     this.notifyContainer.classList.add(`notify_${typeContent}`);
     let notify = document.createElement('div');
     notify.classList.add('notify__text');
     notify.innerText = content;
     this.notifyContainer.append(notify);
-
     let notifyClose = document.createElement('button');
+    notifyClose.classList.add(`notify__close`);
     notifyClose.classList.add(`notify__close_${typeContent}`);
     notifyClose.innerText = '×';
     this.notifyContainer.append(notifyClose);
-    setTimeout(this.closeMessage.bind(this), 4000);
+    this.notifyContainer.addEventListener('click', (event) => this.handlerClick(event));
+    await this.wait(5000);
+    this.closeMessage();
   }
 
-
+  async wait(ms) {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms);
+    });
+  }
   private closeMessage(): void {
     this.notifyContainer.classList.remove('notify');
     this.notifyContainer.innerHTML = '';
