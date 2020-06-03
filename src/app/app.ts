@@ -90,7 +90,7 @@ class App {
     this.LAT = '55.752';
     this.LNG = '37.6156';
     this.KEYMAPAPI = 'AIzaSyBcBdvaJ9lvN0GrEy8Rl8FniJ521aokVMM';
-    this.timezone = '';
+    this.timezone = 'Europe/Minsk';
     this.textLangEn = ['Incorrect data', 'Search city', 'Search'];
     this.textLangBe = ['Няслушныя дадзеныя', 'Знайсцi горад', 'Пошук'];
     this.textLangRu = ['Неверные данные', 'Найти город', 'Поиск'];
@@ -110,6 +110,9 @@ class App {
     this.initRoot();
     if (!localStorage.scale) {
       localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
+    }
+    if (!localStorage.timezone) {
+      localStorage.setItem('timezone', JSON.stringify(this.timezone));
     }
     this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2), this.volume));
     this.root.append(await this.getMain());
@@ -133,20 +136,6 @@ class App {
       }
     }
     this.spinnerOff();
-  }
-
-  private increaseVolume(): void {
-    if (this.volume >= 0 && this.volume < 1) {
-      this.volume += 0.1;
-      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
-    }
-  }
-
-  private decreaseVolume(): void {
-    if (this.volume > 0 && this.volume <= 1) {
-      this.volume -= 0.1;
-      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
-    }
   }
 
 
@@ -530,6 +519,20 @@ class App {
           return true;
         }
       }
+    }
+  }
+
+  private increaseVolume(): void {
+    if (this.volume >= 0 && this.volume < 1) {
+      this.volume += 0.1;
+      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
+    }
+  }
+
+  private decreaseVolume(): void {
+    if (this.volume > 0 && this.volume <= 1) {
+      this.volume -= 0.1;
+      this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     }
   }
 
