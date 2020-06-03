@@ -29,7 +29,7 @@
   user-select: none
 }
 
-.notify__close {
+.notify__close_error {
   position: absolute;
   top: -1px;
   right: 5px;
@@ -37,14 +37,19 @@
   cursor: pointer;
   background-color: transparent;
   border: none;
-  transition: color .3s
-}
-
-.notify__close_error {
+  transition: color .3s;
   color: #b54a4a
 }
 
 .notify__close_info {
+  position: absolute;
+  top: -1px;
+  right: 5px;
+  font-size: 30px;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  transition: color .3s;
   color: #53b54a
 }
 

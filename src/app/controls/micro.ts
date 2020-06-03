@@ -26,12 +26,9 @@ export default class Micro {
         .map(result => result[0])
         .map(result => result.transcript)
         .join('');
-
       word = transcript.toLowerCase();
       input.value = word;
-
       this.getSearch(word);
-
     });
 
     this.recognition.addEventListener('end', this.recognition.start);

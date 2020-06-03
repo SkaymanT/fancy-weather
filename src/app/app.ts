@@ -6,6 +6,7 @@ import { getLoader } from './component/loader';
 import { getDate, getWeekDays } from './component/week';
 import { getFooter, updateFooter } from './component/footer';
 import Message from './component/message';
+import Notify from './component/notify';
 
 
 window.onload = () => {
@@ -40,6 +41,7 @@ class App {
   weather: Weather;
   map: Map;
   message: Message;
+  notify: Notify;
   root: HTMLDivElement;
   preloader: HTMLDivElement;
   KEYIMAGEAPI: string;
@@ -66,6 +68,7 @@ class App {
   textHelpBe: Array<string>;
   listLanguage: Array<string>;
   listScale: Array<string>;
+  keyWords: Array<object>;
   constructor() {
     this.listScale = ['°F', '°C'];
     this.listLanguage = ['en', 'ru', 'be'];
@@ -77,6 +80,7 @@ class App {
     this.controls = new Controls(this.doChangesCityFromSearch.bind(this), this.doChangeBackground.bind(this), this.doChangeLanguage.bind(this), this.doChangeScale.bind(this), this.doMessage.bind(this), this.listLanguage, this.listScale, this.textSpeak, this.textHelpEn);
     this.weather = new Weather(this.doChangesCityFromSearch.bind(this));
     this.map = new Map();
+    this.notify = new Notify();
     this.message = new Message(this.textHelpEn);
     this.KEYIMAGEAPI = 'GZ3T-OqnbT6kW0m8CccKw-ucz4MaeTsJ29r2rKflNoQ';
     this.KEYCURRENT = '20fe2091eb094bb1890cccc4ec32592f';
@@ -95,12 +99,14 @@ class App {
     this.weatherDescription = 'rain';
     this.showDays = 4;
     this.volume = 1;
+    this.keyWords = [{ language: 'en', key: 'nature', increase: 'plus', decrease: 'minus' }, { language: 'ru', key: 'природа', increase: 'плюс', decrease: 'минус' }, { language: 'be', key: 'прырода', increase: 'плюс', decrease: 'мiнус' }];
   }
 
 
   public async initApp(): Promise<void> {
     this.initPreloader();
     this.initMessage();
+    this.initNotify();
     this.initRoot();
     if (!localStorage.scale) {
       localStorage.setItem('scale', JSON.stringify(this.listScale[1]));
@@ -125,18 +131,48 @@ class App {
   }
 
   private checkKeyword(textCity): boolean {
-    if (localStorage.language.substr(1, 2) == 'en') {
+    if (localStorage.language.substr(1, 2) == this.listLanguage[0]) {
       switch (textCity) {
-        case 'природа': {
-          console.log('природа1');
+        case this.keyWords[0]['key']: {
+          console.log(this.keyWords[0]['key']);
+          this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
           return false;
         }
-        case 'плюс': {
-          console.log('плюс');
+        case this.keyWords[0]['increase']: {
+          console.log(this.keyWords[0]['increase']);
+          this.increaseVolume();
+          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
           return false;
         }
-        case 'минус': {
-          console.log('минус');
+        case this.keyWords[0]['decrease']: {
+          console.log(this.keyWords[0]['decrease']);
+          this.decreaseVolume();
+          this.notify.openMessage(`volume: ${this.volume * 100}%  `, 'info');
+          return false;
+        }
+        default: {
+          console.log('search');
+          return true;
+        }
+      }
+    }
+    if (localStorage.language.substr(1, 2) == this.listLanguage[1] || localStorage.language.substr(1, 2) == this.listLanguage[2]) {
+      switch (textCity) {
+        case this.keyWords[0]['key']: {
+          console.log(this.keyWords[0]['key']);
+          this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
+          return false;
+        }
+        case this.keyWords[0]['increase']: {
+          console.log(this.keyWords[0]['increase']);
+          this.increaseVolume();
+          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
+          return false;
+        }
+        case this.keyWords[0]['decrease']: {
+          console.log(this.keyWords[0]['decrease']);
+          this.decreaseVolume();
+          this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
           return false;
         }
         default: {
@@ -145,31 +181,19 @@ class App {
         }
       }
     }
-    if (localStorage.language.substr(1, 2) == 'ru') {
-      switch (textCity) {
-        case 'природа': {
-          console.log('природа2');
-          return false;
-        }
-        case 'плюс': {
-          console.log('плюс2');
-          return false;
-        }
-        case 'минус': {
-          console.log('минус2');
-          return false;
-        }
-        default: {
-          console.log('поиск2');
-          return true;
-        }
-      }
-    }
-    if (localStorage.language.substr(1, 2) == 'be') {
-      console.log('message');
+  }
+
+  private increaseVolume(): void {
+    if (this.volume > 0 && this.volume < 1) {
+      this.volume += 0.1 * this.volume;
     }
   }
 
+  private decreaseVolume(): void {
+    if (this.volume > 0 && this.volume < 1) {
+      this.volume -= 0.1 * this.volume;
+    }
+  }
 
 
   public async doChangeLanguage(language): Promise<void> {
@@ -255,7 +279,7 @@ class App {
   private getInfoCurrent(data: any): CityInfoCurrent {
     this.getInfoSpeak(data);
     switch (localStorage.language.substr(1, 2)) {
-      case 'be': {
+      case this.listLanguage[2]: {
         this.message.updateMessage(this.textHelpBe);
         const objBe: CityInfoCurrent = {
           temp: data.temp.toFixed(),
@@ -268,7 +292,7 @@ class App {
         }
         return objBe;
       }
-      case 'ru': {
+      case this.listLanguage[1]: {
         this.message.updateMessage(this.textHelpRu);
         const objRu: CityInfoCurrent = {
           temp: data.temp.toFixed(),
@@ -300,12 +324,12 @@ class App {
   private getInfoSpeak(data: any): void {
     this.textSpeak = '';
     switch (localStorage.language.substr(1, 2)) {
-      case 'be': {
+      case this.listLanguage[2]: {
         this.textSpeak = `${this.city}, ${data.weather.description}, 
         тэмпература ${data.temp.toFixed()} ${localStorage.scale.substr(1, 2)},  адчуваецца як: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}, вецер: ${data.wind_spd.toFixed()} м/с, вільготнасць: ${data.rh}%`;
         break;
       }
-      case 'ru': {
+      case this.listLanguage[1]: {
         this.textSpeak = `${this.city}, ${data.weather.description}, 
         температура ${data.temp.toFixed()} ${localStorage.scale.substr(1, 2)},  ощущается как: ${data.app_temp.toFixed()}${localStorage.scale.substr(1, 2)}, ветер: ${data.wind_spd.toFixed()} м/с, влажность: ${data.rh}%`;
         break;
@@ -329,7 +353,7 @@ class App {
   private getInfoFooterContent(days: Array<string>, data: any): void {
     this.contentFooter = [];
     switch (localStorage.language.substr(1, 2)) {
-      case 'be': {
+      case this.listLanguage[2]: {
         days.forEach((element, index) => {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
@@ -341,7 +365,7 @@ class App {
         });
         break;
       }
-      case 'ru': {
+      case this.listLanguage[1]: {
         days.forEach((element, index) => {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
@@ -411,6 +435,11 @@ class App {
     body.prepend(this.message.render());
   }
 
+  private initNotify(): void {
+    const body = document.querySelector('body')!;
+    body.prepend(this.notify.render());
+  }
+
   private async getMyGeolocation(): Promise<string> {
     const urlLocation = `https://ipinfo.io/json?token=${this.KEYGEOlOCATION}`;
     let city = '';
@@ -460,10 +489,10 @@ class App {
       localStorage.setItem('language', JSON.stringify(this.listLanguage[0]));
     }
     switch (localStorage.language.substr(1, 2)) {
-      case 'be': {
+      case this.listLanguage[2]: {
         return this.textLangBe;
       }
-      case 'ru': {
+      case this.listLanguage[1]: {
         return this.textLangRu;
       }
       default: {
