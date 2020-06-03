@@ -22,17 +22,10 @@ export default class Map {
   public async updateLocation(lat: string, lng: string, language: string): Promise<void> {
     let mapIframe = this.mapContainer.querySelector('.map-iframe') as HTMLIFrameElement;
     mapIframe.src = `https://www.google.com/maps/embed/v1/place?q=${lat},${lng}&zoom=11&key=${this.KEYMAPAPI}&language=${language}`;
-    await this.wait(5000);
     let coordinatesContainer = this.mapContainer.querySelectorAll('.map-container__coordinates>p') as NodeListOf<HTMLParagraphElement>;
     const coordinates = this.updateCoordinates(lat, lng, language);
     coordinatesContainer[0].innerText = coordinates[0];
     coordinatesContainer[1].innerText = coordinates[1];
-  }
-
-  async wait(ms) {
-    return new Promise(resolve => {
-      setTimeout(resolve, ms);
-    });
   }
 
   private async getMap(lat: string, lng: string, language: string): Promise<HTMLDivElement> {
