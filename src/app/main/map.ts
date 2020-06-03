@@ -21,30 +21,43 @@ export default class Map {
 
   public async updateLocation(lat: string, lng: string, language: string): Promise<void> {
     let mapIframe = this.mapContainer.querySelector('.map-iframe') as HTMLIFrameElement;
-    console.log('sss1');
-    let src = `https://www.google.com/maps/embed/v1/place?q=${lat},${lng}&zoom=11&key=${this.KEYMAPAPI}&language=${language}`;
-    await this.addIframeProcess(src);
-
+    console.log(mapIframe);
+    mapIframe.src = `https://www.google.com/maps/embed/v1/place?q=${lat},${lng}&zoom=11&key=${this.KEYMAPAPI}&language=${language}`;
+    await this.wait(5000);
+    console.log(mapIframe);
     let coordinatesContainer = this.mapContainer.querySelectorAll('.map-container__coordinates>p') as NodeListOf<HTMLParagraphElement>;
     const coordinates = this.updateCoordinates(lat, lng, language);
     coordinatesContainer[0].innerText = coordinates[0];
     coordinatesContainer[1].innerText = coordinates[1];
   }
 
+  async wait(ms) {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms);
+    });
+  }
+
   private onloadPromise<T extends OnLoadAble>(obj: T): Promise<T> {
+    console.log('123123');
     return new Promise((resolve, reject) => {
       obj.onload = () => resolve(obj);
       obj.onerror = reject;
     });
   }
 
+
+
   private async addIframeProcess(src): Promise<void> {
-    const iframe = document.createElement('iframe');
-    let iframepromise = this.onloadPromise(iframe);
+    let iframe = document.createElement('iframe');
     console.log('ss112');
     // let mapIframe = this.mapContainer.querySelector('.map-iframe') as HTMLIFrameElement;
     iframe.src = src;
+    console.log(iframe);
+    let iframepromise = this.onloadPromise(iframe);
+    console.log(iframepromise);
     await iframepromise;
+    console.log('Ура работает');
+    //что-то делаем
   }
 
   private async getMap(lat: string, lng: string, language: string): Promise<HTMLDivElement> {

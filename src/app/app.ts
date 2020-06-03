@@ -3,7 +3,7 @@ import Controls from './controls/controls';
 import Weather from './main/weather';
 import Map from './main/map';
 import { getLoader } from './component/loader';
-import { getDate, getWeekDays } from './component/week';
+import { getDate, getWeekDays, getSeason, getTimeofDay } from './component/week';
 import { getFooter, updateFooter } from './component/footer';
 import Message from './component/message';
 import Notify from './component/notify';
@@ -83,8 +83,8 @@ class App {
     this.notify = new Notify();
     this.message = new Message(this.textHelpEn);
     this.KEYIMAGEAPI = 'GZ3T-OqnbT6kW0m8CccKw-ucz4MaeTsJ29r2rKflNoQ';
-    this.KEYCURRENT = '20fe2091eb094bb1890cccc4ec32592f';
-    this.KEYFORECAST = '324abe064a5d4a98a54f513199af142b';
+    this.KEYCURRENT = '3eb177f99eeb4f10bd3d06120158fd5c'; //20fe2091eb094bb1890cccc4ec32592f // 3eb177f99eeb4f10bd3d06120158fd5c
+    this.KEYFORECAST = '3eb177f99eeb4f10bd3d06120158fd5c'; //324abe064a5d4a98a54f513199af142b
     this.KEYGEOlOCATION = 'f7edfcc5ad81b0';
     this.KEYGEOCORDING = '57913d93c3a94107bcf4c29eb5f997c7';
     this.LAT = '55.752';
@@ -239,6 +239,7 @@ class App {
 
   private getInfoCurrent(data: any): CityInfoCurrent {
     this.getInfoSpeak(data);
+
     switch (localStorage.language.substr(1, 2)) {
       case this.listLanguage[2]: {
         this.message.updateMessage(this.textHelpBe);
@@ -284,6 +285,7 @@ class App {
 
   private getInfoSpeak(data: any): void {
     this.textSpeak = '';
+    this.weatherDescription = data.weather.description;
     switch (localStorage.language.substr(1, 2)) {
       case this.listLanguage[2]: {
         this.textSpeak = `${this.city}, ${data.weather.description}, 
@@ -353,7 +355,7 @@ class App {
   }
 
   private async doChangeBackground(): Promise<void> {
-    const words = `nature,${this.timesDay},${this.weatherDescription}`;
+    const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
     const url = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
     try {
       const res = await fetch(url);
