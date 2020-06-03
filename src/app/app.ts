@@ -158,19 +158,19 @@ class App {
     }
     if (localStorage.language.substr(1, 2) == this.listLanguage[1] || localStorage.language.substr(1, 2) == this.listLanguage[2]) {
       switch (textCity) {
-        case this.keyWords[0]['key']: {
-          console.log(this.keyWords[0]['key']);
+        case this.keyWords[1]['key']: {
+          console.log(this.keyWords[1]['key']);
           this.controls.speaker.onSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
           return false;
         }
-        case this.keyWords[0]['increase']: {
-          console.log(this.keyWords[0]['increase']);
+        case this.keyWords[1]['increase']: {
+          console.log(this.keyWords[1]['increase']);
           this.increaseVolume();
           this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
           return false;
         }
-        case this.keyWords[0]['decrease']: {
-          console.log(this.keyWords[0]['decrease']);
+        case this.keyWords[1]['decrease']: {
+          console.log(this.keyWords[1]['decrease']);
           this.decreaseVolume();
           this.notify.openMessage(`Громкость: ${this.volume * 100}%  `, 'info');
           return false;
