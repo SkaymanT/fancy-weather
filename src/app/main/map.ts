@@ -6,6 +6,7 @@ export default class Map {
 
   mapContainer: HTMLDivElement;
   KEYMAPAPI: string;
+  
 
   constructor() {
     this.KEYMAPAPI = 'AIzaSyBWWZnqHV3asW7DM3yCQ0dxSHjj_J9LkwE';
@@ -14,6 +15,7 @@ export default class Map {
   public async render(lat: string, lng: string, language: string): Promise<HTMLDivElement> {
     this.mapContainer = document.createElement('div');
     this.mapContainer.classList.add('map-container');
+
     this.mapContainer.append(await this.getMap(lat, lng, language));
     this.mapContainer.append(this.getCoordinates(lat, lng, language));
     return this.mapContainer;
@@ -27,6 +29,16 @@ export default class Map {
     coordinatesContainer[0].innerText = coordinates[0];
     coordinatesContainer[1].innerText = coordinates[1];
   }
+
+  // private async getMap(lat: string, lng: string, language: string): Promise<HTMLDivElement> {
+  //   const mapContainer = document.createElement('div');
+  //   mapContainer.classList.add('map-container__mask');
+  //   const mapIframe = document.createElement('iframe');
+  //   mapIframe.classList.add('map-iframe');
+  //   mapIframe.src = `https://www.google.com/maps/embed/v1/place?q=${lat},${lng}&zoom=11&key=${this.KEYMAPAPI}&language=${language}`;
+  //   mapContainer.append(mapIframe);
+  //   return mapContainer;
+  // }
 
   private async getMap(lat: string, lng: string, language: string): Promise<HTMLDivElement> {
     const mapContainer = document.createElement('div');
