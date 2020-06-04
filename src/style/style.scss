@@ -491,7 +491,7 @@ body {
   text-align: right
 }
 
-.map-iframe {
+#map {
   width: 200%;
   height: 200%;
   -webkit-transform: translate(-25%, -25%);
@@ -636,7 +636,7 @@ body {
   }
 }
 
-@media (max-width:42.5em) {
+@media (max-width:44em) {
   .controls-container {
     -webkit-box-pack: center;
     justify-content: center

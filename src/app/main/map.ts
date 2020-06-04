@@ -7,46 +7,54 @@ export default class Map {
   mapContainer: HTMLDivElement;
   KEYMAPAPI: string;
 
+
   constructor() {
-    this.KEYMAPAPI = 'AIzaSyBWWZnqHV3asW7DM3yCQ0dxSHjj_J9LkwE';
+    this.KEYMAPAPI = 'pk.eyJ1Ijoic2theW1hbnQiLCJhIjoiY2tiMGc2dGJhMDdzajJ4bWVtcnFrdHI5ZyJ9.JVI3u1rZALDoFrEjvcwZcg';
   }
 
-  public async render(lat: string, lng: string, language: string): Promise<HTMLDivElement> {
+  public render(): HTMLDivElement {
     this.mapContainer = document.createElement('div');
     this.mapContainer.classList.add('map-container');
-    this.mapContainer.append(await this.getMap(lat, lng, language));
-    this.mapContainer.append(this.getCoordinates(lat, lng, language));
+
+    this.mapContainer.append(this.getMap());
+    this.mapContainer.append(this.getCoordinates());
     return this.mapContainer;
   }
 
   public async updateLocation(lat: string, lng: string, language: string): Promise<void> {
-    let mapIframe = this.mapContainer.querySelector('.map-iframe') as HTMLIFrameElement;
-    mapIframe.src = `https://www.google.com/maps/embed/v1/place?q=${lat},${lng}&zoom=11&key=${this.KEYMAPAPI}&language=${language}`;
+    mapboxgl.accessToken = this.KEYMAPAPI;
+    let map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v10',
+      center: [lng, lat],
+      zoom: 10
+    });
+
+    let marker = new mapboxgl.Marker()
+      .setLngLat([lng, lat])
+      .addTo(map);
     let coordinatesContainer = this.mapContainer.querySelectorAll('.map-container__coordinates>p') as NodeListOf<HTMLParagraphElement>;
     const coordinates = this.updateCoordinates(lat, lng, language);
     coordinatesContainer[0].innerText = coordinates[0];
     coordinatesContainer[1].innerText = coordinates[1];
   }
 
-  private async getMap(lat: string, lng: string, language: string): Promise<HTMLDivElement> {
-    const mapContainer = document.createElement('div');
-    mapContainer.classList.add('map-container__mask');
-    const mapIframe = document.createElement('iframe');
-    mapIframe.classList.add('map-iframe');
-    mapIframe.src = `https://www.google.com/maps/embed/v1/place?q=${lat},${lng}&zoom=11&key=${this.KEYMAPAPI}&language=${language}`;
-    mapContainer.append(mapIframe);
-    return mapContainer;
+
+  private getMap(): HTMLDivElement {
+    const mapMask = document.createElement('div');
+    mapMask.classList.add('map-container__mask');
+    let mapContainer = document.createElement('div');
+    mapContainer.id = 'map';
+    mapMask.append(mapContainer);
+    return mapMask;
   }
 
-  private getCoordinates(lat: string, lng: string, language: string): HTMLDivElement {
+  private getCoordinates(): HTMLDivElement {
     const coordinatesContainer = document.createElement('div');
     coordinatesContainer.classList.add('map-container__coordinates');
     const xCoordinates = document.createElement('p');
-    const coordinates = this.updateCoordinates(lat, lng, language);
-    xCoordinates.innerText = coordinates[0];
     coordinatesContainer.append(xCoordinates);
     const yCoordinates = document.createElement('p');
-    yCoordinates.innerText = coordinates[1];
     coordinatesContainer.append(yCoordinates);
     return coordinatesContainer;
   }
