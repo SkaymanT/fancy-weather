@@ -38,7 +38,6 @@ export function getTimeofDay(timezone: string): string {
     const date = new Date(indiaTime);
     let dayArrayEn = new Array('night', 'night', 'night', 'night', 'night', 'morning', 'morning', 'morning', 'morning', 'morning', 'day', 'day', 'day', 'day', 'day', 'day', 'evening', 'evening', 'evening', 'evening', 'evening', 'evening', 'evening', 'night');
     const hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours();
-    console.log(timezone);
     return dayArrayEn[hours];
 }
 
