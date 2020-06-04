@@ -116,6 +116,7 @@ class App {
     }
     this.root.append(this.controls.render(this.defineLanguage(), localStorage.language.substr(1, 2), localStorage.scale.substr(1, 2), this.volume));
     this.root.append(await this.getMain());
+    this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
     this.root.append(getFooter(this.contentFooter));
     await this.doChangeBackground();
     this.spinnerOff();
@@ -149,7 +150,6 @@ class App {
     this.controls.search.changedSearch(this.defineLanguage());
     await this.doChangesWeather();
     this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
-    this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
     this.spinnerOff();
   }
 
@@ -173,6 +173,7 @@ class App {
     this.city = await this.getMyGeolocation();
     const main = document.createElement('div');
     main.classList.add('main-container');
+    main.append(this.map.render());
     const forecast: CityForecast[] = [];
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
     const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
@@ -187,8 +188,7 @@ class App {
         }
       });
       this.getInfoFooterContent(daysWeek, data[1]);
-      main.append(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, this.city));
-      main.append(await this.map.render(this.LAT, this.LNG, localStorage.language.substr(1, 2)));
+      main.prepend(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, this.city));
       this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     } catch (error) {
       this.notify.openMessage(`no connect`, 'error');
