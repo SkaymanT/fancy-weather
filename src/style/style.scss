@@ -636,6 +636,27 @@ body {
   }
 }
 
+@media (max-width:42.5em) {
+  .controls-container {
+    -webkit-box-pack: center;
+    justify-content: center
+  }
+
+  .controls-btns-container {
+    -webkit-box-ordinal-group: 2;
+    order: 1;
+    margin: 4rem 5rem 0
+  }
+
+  .search-container {
+    margin: 0 5rem
+  }
+
+  .drop-down-menu {
+    position: relative
+  }
+}
+
 @media (max-width:37.5em) {
   .controls-container {
     -webkit-box-pack: center;
