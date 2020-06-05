@@ -9,7 +9,7 @@ describe('Scale test click on buttons', () => {
     });
   }
   let listScale = ['°F', '°C'];
-  let max = 3;
+  let max = 2;
   let temperatureScale = new TemperatureScale(doChanges, listScale);
   let scaleContainer = temperatureScale.render(listScale[0]);
 
