@@ -205,11 +205,14 @@ class App {
       }
       this.city = result;
       const forecast: CityForecast[] = [];
+      const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
+      const urlImage = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
       const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
       const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
-      let requests = [fetch(urlCurrent), fetch(urlForecast)];
+      let requests = [fetch(urlCurrent), fetch(urlForecast), fetch(urlImage)];
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map(r => r.json()));
+      await this.addImageProcess(data[2].urls.full);
       const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
       data[1].data.forEach((element, index) => {
         if (index !== 0 && index < this.showDays) {
@@ -220,6 +223,7 @@ class App {
       updateFooter(this.contentFooter);
       this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
     } catch (error) {
+      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg2.png);`;
       this.notify.openMessage(`Disconnection `, 'error');
       console.log('Error', error);
     }
