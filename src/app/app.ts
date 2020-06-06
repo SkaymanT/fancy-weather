@@ -130,7 +130,7 @@ class App {
     this.spinnerOn();
     if (this.checkKeywordFromMicro(textCity)) {
       this.city = textCity;
-      let result = await this.doChangesWeather();
+      let result = await this.doChangesWeatherFromSearch();
       if (result !== undefined) {
         this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
         this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
@@ -198,6 +198,37 @@ class App {
   }
 
   private async doChangesWeather(): Promise<string> {
+    try {
+      let result = await this.getGeolocationCity(this.city);
+      if (result === undefined) {
+        return undefined;
+      }
+      this.city = result;
+      const forecast: CityForecast[] = [];
+      const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
+      const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
+      const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
+      let requests = [fetch(urlCurrent), fetch(urlForecast)];
+      const responses = await Promise.all(requests);
+      const data = await Promise.all(responses.map(r => r.json()));
+      const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
+      data[1].data.forEach((element, index) => {
+        if (index !== 0 && index < this.showDays) {
+          forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
+        }
+      });
+      this.getInfoFooterContent(daysWeek, data[1]);
+      updateFooter(this.contentFooter);
+      this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
+    } catch (error) {
+      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg2.png);`;
+      this.notify.openMessage(`Disconnection `, 'error');
+      console.log('Error', error);
+    }
+    return this.city;
+  }
+
+  private async doChangesWeatherFromSearch(): Promise<string> {
     try {
       let result = await this.getGeolocationCity(this.city);
       if (result === undefined) {
