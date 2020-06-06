@@ -18,7 +18,7 @@ export default class Message {
 
     let buttonClose = document.createElement('button');
     buttonClose.classList.add('message-info__button-close');
-    buttonClose.innerText = '×';
+    buttonClose.innerHTML = '×';
     messageInfo.append(buttonClose);
 
     let infoContainer = document.createElement('div');
@@ -26,37 +26,37 @@ export default class Message {
 
     let infoHeader = document.createElement('h2');
     infoHeader.classList.add('info-header');
-    infoHeader.innerText = this.content[0];
+    infoHeader.innerHTML = this.content[0];
     infoContainer.append(infoHeader);
 
     let header = document.createElement('h3');
     header.classList.add('info-paragraph');
-    header.innerText = this.content[1];
+    header.innerHTML = this.content[1];
     infoContainer.append(header);
 
     let infoText1 = document.createElement('p');
     infoText1.classList.add('info-text');
-    infoText1.innerText = this.content[2];
+    infoText1.innerHTML = this.content[2];
     infoContainer.append(infoText1);
 
     let infoText2 = document.createElement('p');
     infoText2.classList.add('info-text');
-    infoText2.innerText = this.content[3];
+    infoText2.innerHTML = this.content[3];
     infoContainer.append(infoText2);
 
     let infoText3 = document.createElement('p');
     infoText3.classList.add('info-text');
-    infoText3.innerText = this.content[4];
+    infoText3.innerHTML = this.content[4];
     infoContainer.append(infoText3);
 
     let infoParagraph = document.createElement('h3');
     infoParagraph.classList.add('info-paragraph');
-    infoParagraph.innerText = this.content[5];
+    infoParagraph.innerHTML = this.content[5];
     infoContainer.append(infoParagraph);
 
     let infoText4 = document.createElement('p');
     infoText4.classList.add('info-text');
-    infoText4.innerText = this.content[6];
+    infoText4.innerHTML = this.content[6];
     infoContainer.append(infoText4);
 
     messageInfo.append(infoContainer);

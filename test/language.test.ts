@@ -5,7 +5,6 @@ describe('Scale test click on buttons', () => {
     expect(testContainer.querySelector('.droplist-base>span').innerHTML).toEqual(t);
   }
   let listLanguage = ['en', 'ru', 'be'];
-  let max = 3;
   let test = new MenuLanguage(doChanges, listLanguage);
   let testContainer = test.render(listLanguage[0]);
 
