@@ -16,7 +16,7 @@ export default class TemperatureScale {
       scaleButton.classList.add(`button--${element.slice(1).toLowerCase()}`);
       scaleButton.classList.add('button');
       scaleButton.classList.add('inactive');
-      scaleButton.innerText = element;
+      scaleButton.innerHTML = element;
       this.temperatureScale.append(scaleButton);
     });
     this.temperatureScale.querySelector(`.button--${scale.slice(1).toLowerCase()}`).classList.remove('inactive');

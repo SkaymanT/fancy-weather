@@ -130,7 +130,7 @@ class App {
     this.spinnerOn();
     if (this.checkKeywordFromMicro(textCity)) {
       this.city = textCity;
-      let result = await this.doChangesWeather();
+      let result = await this.doChangesWeatherFromSearch();
       if (result !== undefined) {
         this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
         this.map.updateLocation(this.LAT, this.LNG, localStorage.language.substr(1, 2));
@@ -206,6 +206,37 @@ class App {
       this.city = result;
       const forecast: CityForecast[] = [];
       const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
+      const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
+      const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
+      let requests = [fetch(urlCurrent), fetch(urlForecast)];
+      const responses = await Promise.all(requests);
+      const data = await Promise.all(responses.map(r => r.json()));
+      const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
+      data[1].data.forEach((element, index) => {
+        if (index !== 0 && index < this.showDays) {
+          forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
+        }
+      });
+      this.getInfoFooterContent(daysWeek, data[1]);
+      updateFooter(this.contentFooter);
+      this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
+    } catch (error) {
+      document.querySelector('body').style.cssText = `background-image: url(../assets/img/bg2.png);`;
+      this.notify.openMessage(`Disconnection `, 'error');
+      console.log('Error', error);
+    }
+    return this.city;
+  }
+
+  private async doChangesWeatherFromSearch(): Promise<string> {
+    try {
+      let result = await this.getGeolocationCity(this.city);
+      if (result === undefined) {
+        return undefined;
+      }
+      this.city = result;
+      const forecast: CityForecast[] = [];
+      const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
       const urlImage = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
       const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.LAT}&lon=${this.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
       const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.LAT}&lon=${this.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
@@ -240,7 +271,7 @@ class App {
           temp: data.temp.toFixed(),
           app_temp: `АДЧУВАЕЦЦА ЯК: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
-          datetime: getDate(data.timezone),
+          datetime: getDate(data.timezone, localStorage.language.substr(1, 2)),
           description: data.weather.description,
           wind_spd: `ВЕЦЕР: ${data.wind_spd.toFixed()} м/с`,
           rh: `ВІЛЬГОТНАСЦЬ: ${data.rh}%`,
@@ -253,7 +284,7 @@ class App {
           temp: data.temp.toFixed(),
           app_temp: `ОЩУЩАЕТСЯ КАК: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
-          datetime: getDate(data.timezone),
+          datetime: getDate(data.timezone, localStorage.language.substr(1, 2)),
           description: data.weather.description,
           wind_spd: `ВЕТЕР: ${data.wind_spd.toFixed()} м/с`,
           rh: `ВЛАЖНОСТЬ: ${data.rh}%`,
@@ -266,7 +297,7 @@ class App {
           temp: data.temp.toFixed(),
           app_temp: `FEELS LIKE: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
-          datetime: getDate(data.timezone),
+          datetime: getDate(data.timezone, localStorage.language.substr(1, 2)),
           description: data.weather.description,
           wind_spd: `WIND: ${data.wind_spd.toFixed()} m/s`,
           rh: `HUMIDITY: ${data.rh}%`,

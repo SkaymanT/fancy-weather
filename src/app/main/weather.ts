@@ -36,9 +36,9 @@ export default class Weather {
   public refreshTime(): void {
     if (document.querySelector('.weather-container__date-time')) {
       if (localStorage.timezone) {
-        document.querySelector('.weather-container__date-time').innerHTML = getDate(localStorage.timezone.substring(1, localStorage.timezone.length - 1));
+        document.querySelector('.weather-container__date-time').innerHTML = getDate(localStorage.timezone.substring(1, localStorage.timezone.length - 1), localStorage.language.substr(1, 2));
       } else {
-        document.querySelector('.weather-container__date-time').innerHTML = getDate('Europe/Minsk');
+        document.querySelector('.weather-container__date-time').innerHTML = getDate('Europe/Minsk', localStorage.language.substr(1, 2));
       }
     }
   }

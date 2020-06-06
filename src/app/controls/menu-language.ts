@@ -15,7 +15,7 @@ export default class MenuLanguage {
     buttonDroplist.classList.add('droplist-base');
     buttonDroplist.classList.add('button');
     const spanName = document.createElement('span');
-    spanName.innerText = language;
+    spanName.innerHTML = language;
     buttonDroplist.append(spanName);
     const spanArrow = document.createElement('span');
     spanArrow.classList.add('arrow-down');
@@ -31,7 +31,7 @@ export default class MenuLanguage {
         buttonOption.classList.add('inactive');
       }
       buttonOption.id = element;
-      buttonOption.innerText = element;
+      buttonOption.innerHTML = element;
       menuDropDown.append(buttonOption);
     });
     this.menuLanguage.append(buttonDroplist);

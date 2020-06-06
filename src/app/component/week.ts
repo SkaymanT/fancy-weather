@@ -1,4 +1,4 @@
-export function getDate(timezone: string): string {
+export function getDate(timezone: string, language: string): string {
     localStorage.setItem('timezone', JSON.stringify(timezone));
     let indiaTime = new Date().toLocaleString("en-US", { timeZone: timezone });
     const date = new Date(indiaTime);
@@ -11,14 +11,14 @@ export function getDate(timezone: string): string {
     const hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours();
     const minutes = (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes();
     const seconds = (date.getSeconds() < 10) ? '0' + date.getSeconds() : date.getSeconds();
-    if (localStorage.language) {
-        if (localStorage.language.substr(1, 2) === 'en') {
+    if (language) {
+        if (language === 'en') {
             return daysEn[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayEn[date.getMonth()] + ' ' + hours + ':' + minutes + ':' + seconds;
         }
-        if (localStorage.language.substr(1, 2) === 'ru') {
+        if (language === 'ru') {
             return daysRu[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayRu[date.getMonth()] + ' ' + hours + ':' + minutes + ':' + seconds;
         }
-        if (localStorage.language.substr(1, 2) === 'be') {
+        if (language === 'be') {
             return daysBe[date.getDay()] + ' ' + date.getDate() + ' ' + MonthArrayBe[date.getMonth()] + ' ' + hours + ':' + minutes + ':' + seconds;
         }
     } else {

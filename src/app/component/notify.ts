@@ -14,19 +14,19 @@ export default class Notify {
     this.notifyContainer.classList.add(`notify_${typeContent}`);
     let notify = document.createElement('div');
     notify.classList.add('notify__text');
-    notify.innerText = content;
+    notify.innerHTML = content;
     this.notifyContainer.append(notify);
     let notifyClose = document.createElement('button');
     notifyClose.classList.add(`notify__close`);
     notifyClose.classList.add(`notify__close_${typeContent}`);
-    notifyClose.innerText = '×';
+    notifyClose.innerHTML = '×';
     this.notifyContainer.append(notifyClose);
     this.notifyContainer.addEventListener('click', (event) => this.handlerClick(event));
     await this.wait(5000);
     this.closeMessage();
   }
 
-  async wait(ms) {
+  public async wait(ms) {
     return new Promise(resolve => {
       setTimeout(resolve, ms);
     });
