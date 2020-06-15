@@ -1,4 +1,4 @@
-import Helper from '../src/app/controls/helper';
+import Helper from './helper';
 
 describe('Helper', () => {
   function doMessage() {

@@ -1,4 +1,4 @@
-import { getDate, getSeason, getTimeofDay } from '../src/app/component/week';
+import { getDate, getSeason, getTimeofDay } from './week';
 
 describe('check getDate', () => {
 

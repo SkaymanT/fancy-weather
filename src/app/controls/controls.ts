@@ -1,9 +1,9 @@
 import RefreshButton from './refresh-button';
-import MenuLanguage from './menu-language';
-import TemperatureScale from './temperature-scale';
+import MenuLanguage from './menu-language/menu-language';
+import TemperatureScale from './temperature-scale/temperature-scale';
 import Search from './search';
 import Speaker from './speaker';
-import Helper from './helper';
+import Helper from './helper/helper';
 
 export default class Controls {
   search: Search;

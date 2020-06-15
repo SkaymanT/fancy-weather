@@ -1,4 +1,4 @@
-import Notify from '../src/app/component/notify';
+import Notify from './notify';
 
 describe('notify opens', () => {
   async function doChanges() {

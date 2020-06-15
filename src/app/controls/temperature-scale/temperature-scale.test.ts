@@ -1,4 +1,4 @@
-import TemperatureScale from '../src/app/controls/temperature-scale';
+import TemperatureScale from './temperature-scale';
 
 describe('Scale test click on buttons', () => {
   function doChanges(t) {

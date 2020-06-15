@@ -1,4 +1,4 @@
-import Message from '../src/app/component/message';
+import Message from './message';
 
 describe('Message opens', () => {
   async function doChanges() {

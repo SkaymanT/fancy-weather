@@ -1,4 +1,4 @@
-import MenuLanguage from '../src/app/controls/menu-language';
+import MenuLanguage from './menu-language';
 
 describe('Scale test click on buttons', () => {
   function doChanges(t: string) {

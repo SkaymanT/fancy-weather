@@ -1,4 +1,4 @@
-import { getDate } from '../component/week';
+import { getDate } from '../component/week/week';
 
 interface CityForecast {
   temp: string,

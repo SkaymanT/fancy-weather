@@ -8,7 +8,7 @@
     "build": "webpack --mode production",
     "style": "sass --watch src/style/style.scss dist/style.css",
     "start": "webpack-dev-server",
-    "test": "jest",
+    "lint": "jest",
     "test-watch": "jest --watch"
   },
   "repository": {
