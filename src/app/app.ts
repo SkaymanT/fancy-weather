@@ -10,6 +10,7 @@ import Notify from './component/notify/notify';
 import { OnLoadAble, CityForecast, CityInfoCurrent, IMapOptions } from './models/models';
 
 
+
 window.onload = () => {
   const app = new App();
   app.initApp();
@@ -21,6 +22,7 @@ class App {
   weather: Weather;
   map: Map;
   message: Message;
+  VOLUME_STEP: number;
   notify: Notify;
   root: HTMLDivElement;
   preloader: HTMLDivElement;
@@ -53,6 +55,7 @@ class App {
       LNG: '37.6156',
       KEYMAPAPI: 'AIzaSyBcBdvaJ9lvN0GrEy8Rl8FniJ521aokVMM',
     }
+    this.VOLUME_STEP = 0.1;
     this.listScale = ['°F', '°C'];
     this.listLanguage = ['en', 'ru', 'be'];
     this.textSpeak = 'ERROR';
@@ -102,7 +105,7 @@ class App {
   }
 
   public async doChangesCityFromSearch(textCity): Promise<void> {
-    if (textCity === '') {
+    if (!textCity) {
       this.notify.openMessage(`not entered city`, 'error');
       return;
     }
@@ -110,7 +113,7 @@ class App {
     if (this.checkKeywordFromMicro(textCity)) {
       this.city = textCity;
       let result = await this.doChangesWeatherFromSearch();
-      if (result !== undefined) {
+      if (!result) {
         this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
         this.map.updateLocation(this.MAPOPTIONS.LAT, this.MAPOPTIONS.LNG, localStorage.language.substr(1, 2));
       }
@@ -147,7 +150,7 @@ class App {
     const main = document.createElement('div');
     main.classList.add('main-container');
     main.append(this.map.render());
-    const forecast: CityForecast[] = [];
+    let forecast: CityForecast[] = [];
     const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.MAPOPTIONS.LAT}&lon=${this.MAPOPTIONS.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
     const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.MAPOPTIONS.LAT}&lon=${this.MAPOPTIONS.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
     try {
@@ -155,11 +158,7 @@ class App {
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map(r => r.json()));
       const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
-      data[1].data.forEach((element, index) => {
-        if (index !== 0 && index < this.showDays) {
-          forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
-        }
-      });
+      forecast = this.getInfoDays(data[1].data, daysWeek);
       this.getInfoFooterContent(daysWeek, data[1]);
       main.prepend(this.weather.render(this.getInfoCurrent(data[0].data[0]), forecast, this.city));
       this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
@@ -177,7 +176,7 @@ class App {
         return undefined;
       }
       this.city = result;
-      const forecast: CityForecast[] = [];
+      let forecast: CityForecast[] = [];
       const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
       const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.MAPOPTIONS.LAT}&lon=${this.MAPOPTIONS.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
       const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.MAPOPTIONS.LAT}&lon=${this.MAPOPTIONS.LNG}&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYFORECAST}`;
@@ -185,11 +184,7 @@ class App {
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map(r => r.json()));
       const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
-      data[1].data.forEach((element, index) => {
-        if (index !== 0 && index < this.showDays) {
-          forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
-        }
-      });
+      forecast = this.getInfoDays(data[1].data, daysWeek);
       this.getInfoFooterContent(daysWeek, data[1]);
       updateFooter(this.contentFooter);
       this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
@@ -204,11 +199,11 @@ class App {
   private async doChangesWeatherFromSearch(): Promise<string> {
     try {
       let result = await this.getGeolocationCity(this.city);
-      if (result === undefined) {
-        return undefined;
+      if (!result) {
+        return;
       }
       this.city = result;
-      const forecast: CityForecast[] = [];
+      let forecast: CityForecast[] = [];
       const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
       const urlImage = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
       const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.MAPOPTIONS.LAT}&lon=${this.MAPOPTIONS.LNG}&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(1, 2)}&key=${this.KEYCURRENT}`;
@@ -218,11 +213,7 @@ class App {
       const data = await Promise.all(responses.map(r => r.json()));
       await this.addImageProcess(data[2].urls.full);
       const daysWeek = getWeekDays(data[1].timezone, data[1].data.length);
-      data[1].data.forEach((element, index) => {
-        if (index !== 0 && index < this.showDays) {
-          forecast.push(this.getInfoForecast(daysWeek[index - 1], element));
-        }
-      });
+      forecast = this.getInfoDays(data[1].data, daysWeek);
       this.getInfoFooterContent(daysWeek, data[1]);
       updateFooter(this.contentFooter);
       this.weather.doChangedWeather(this.getInfoCurrent(data[0].data[0]), forecast, this.city);
@@ -234,13 +225,17 @@ class App {
     return this.city;
   }
 
+  private getInfoDays(data: any, daysWeek: Array<string>): Array<CityForecast> {
+    return data.map((data, index) => { return this.getInfoForecast(daysWeek[index - 1], data) }).filter((data, index) => { return (index !== 0 && index < this.showDays) });
+  }
+
   private getInfoCurrent(data: any): CityInfoCurrent {
     this.getInfoSpeak(data);
 
     switch (localStorage.language.substr(1, 2)) {
       case this.listLanguage[2]: {
         this.message.updateMessage(this.textHelpBe);
-        const objBe: CityInfoCurrent = {
+        return {
           temp: data.temp.toFixed(),
           app_temp: `АДЧУВАЕЦЦА ЯК: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
@@ -248,12 +243,11 @@ class App {
           description: data.weather.description,
           wind_spd: `ВЕЦЕР: ${data.wind_spd.toFixed()} м/с`,
           rh: `ВІЛЬГОТНАСЦЬ: ${data.rh}%`,
-        }
-        return objBe;
+        };
       }
       case this.listLanguage[1]: {
         this.message.updateMessage(this.textHelpRu);
-        const objRu: CityInfoCurrent = {
+        return {
           temp: data.temp.toFixed(),
           app_temp: `ОЩУЩАЕТСЯ КАК: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
@@ -261,12 +255,11 @@ class App {
           description: data.weather.description,
           wind_spd: `ВЕТЕР: ${data.wind_spd.toFixed()} м/с`,
           rh: `ВЛАЖНОСТЬ: ${data.rh}%`,
-        }
-        return objRu;
+        };
       }
       default: {
         this.message.updateMessage(this.textHelpEn);
-        const objEn: CityInfoCurrent = {
+        return {
           temp: data.temp.toFixed(),
           app_temp: `FEELS LIKE: ${data.app_temp.toFixed()} ${localStorage.scale.substr(1, 2)}`,
           icon: `../assets/icon/${data.weather.icon}.svg`,
@@ -274,8 +267,7 @@ class App {
           description: data.weather.description,
           wind_spd: `WIND: ${data.wind_spd.toFixed()} m/s`,
           rh: `HUMIDITY: ${data.rh}%`,
-        }
-        return objEn;
+        };
       }
     }
   }
@@ -302,12 +294,11 @@ class App {
   }
 
   private getInfoForecast(day: string, data: any): CityForecast {
-    const obj: CityForecast = {
+    return {
       datetime: day,
       temp: data.temp.toFixed(),
       icon: `../assets/icon/${data.weather.icon}.svg`,
-    }
-    return obj;
+    };
   }
 
   private getInfoFooterContent(days: Array<string>, data: any): void {
@@ -353,9 +344,9 @@ class App {
 
   private async doChangeBackground(): Promise<void> {
     const words = `nature,${getSeason()}, ${getTimeofDay(localStorage.timezone.substring(1, localStorage.timezone.length - 1))},${this.weatherDescription}`;
-    const url = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
+    const urlsConst = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
     try {
-      const res = await fetch(url);
+      const res = await fetch(urlsConst);
       const data = await res.json();
       await this.addImageProcess(data.urls.full);
     } catch (error) {
@@ -532,14 +523,14 @@ class App {
 
   private increaseVolume(): void {
     if (this.volume >= 0 && this.volume < 1) {
-      this.volume += 0.1;
+      this.volume += this.VOLUME_STEP;
       this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     }
   }
 
   private decreaseVolume(): void {
     if (this.volume > 0 && this.volume <= 1) {
-      this.volume -= 0.1;
+      this.volume -= this.VOLUME_STEP;
       this.controls.speaker.updateSpeaker(this.textSpeak, localStorage.language.substr(1, 2), this.volume);
     }
   }
