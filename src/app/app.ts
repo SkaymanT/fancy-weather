@@ -184,12 +184,13 @@ class App {
     if (this.checkKeywordFromMicro(textCity)) {
       this.city = textCity;
       let result = await this.doChangesWeatherFromSearch();
-      if (!result) {
+      if (result) {
         this.controls.speaker.updateSpeaker(
           this.textSpeak,
           localStorage.language.substr(1, 2),
           this.volume
         );
+        console.log(result, this.MAPOPTIONS.LAT, this.MAPOPTIONS.LNG);
         this.map.updateLocation(
           this.MAPOPTIONS.LAT,
           this.MAPOPTIONS.LNG,
