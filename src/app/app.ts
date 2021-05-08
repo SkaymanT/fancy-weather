@@ -1,4 +1,3 @@
-import '../style/style.scss';
 import Controls from './controls/controls';
 import Weather from './main/weather';
 import Map from './main/map';
@@ -19,13 +18,7 @@ import {
   IMapOptions,
 } from './models/models';
 
-window.onload = () => {
-  const app = new App();
-  app.initApp();
-  window.setInterval(app.weather.refreshTime, 1000);
-};
-
-class App {
+export default class App {
   controls: Controls;
   weather: Weather;
   map: Map;
@@ -171,6 +164,7 @@ class App {
       localStorage.language.substr(1, 2)
     );
     this.root.append(getFooter(this.contentFooter));
+    console.log("preloader");
     await this.doChangeBackground();
     this.spinnerOff();
   }
@@ -242,22 +236,18 @@ class App {
     main.classList.add('main-container');
     main.append(this.map.render());
     let forecast: CityForecast[] = [];
-    const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${
-      this.MAPOPTIONS.LAT
-    }&lon=${
-      this.MAPOPTIONS.LNG
-    }&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
-      1,
-      2
-    )}&key=${this.KEYCURRENT}`;
-    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${
-      this.MAPOPTIONS.LAT
-    }&lon=${
-      this.MAPOPTIONS.LNG
-    }&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
-      1,
-      2
-    )}&key=${this.KEYFORECAST}`;
+    const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.MAPOPTIONS.LAT
+      }&lon=${this.MAPOPTIONS.LNG
+      }&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
+        1,
+        2
+      )}&key=${this.KEYCURRENT}`;
+    const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.MAPOPTIONS.LAT
+      }&lon=${this.MAPOPTIONS.LNG
+      }&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
+        1,
+        2
+      )}&key=${this.KEYFORECAST}`;
     try {
       let requests = [fetch(urlCurrent), fetch(urlForecast)];
       const responses = await Promise.all(requests);
@@ -295,22 +285,18 @@ class App {
       const words = `nature,${getSeason()}, ${getTimeofDay(
         localStorage.timezone.substring(1, localStorage.timezone.length - 1)
       )},${this.weatherDescription}`;
-      const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${
-        this.MAPOPTIONS.LAT
-      }&lon=${
-        this.MAPOPTIONS.LNG
-      }&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
-        1,
-        2
-      )}&key=${this.KEYCURRENT}`;
-      const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${
-        this.MAPOPTIONS.LAT
-      }&lon=${
-        this.MAPOPTIONS.LNG
-      }&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
-        1,
-        2
-      )}&key=${this.KEYFORECAST}`;
+      const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.MAPOPTIONS.LAT
+        }&lon=${this.MAPOPTIONS.LNG
+        }&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
+          1,
+          2
+        )}&key=${this.KEYCURRENT}`;
+      const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.MAPOPTIONS.LAT
+        }&lon=${this.MAPOPTIONS.LNG
+        }&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
+          1,
+          2
+        )}&key=${this.KEYFORECAST}`;
       let requests = [fetch(urlCurrent), fetch(urlForecast)];
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map((r) => r.json()));
@@ -345,22 +331,18 @@ class App {
         localStorage.timezone.substring(1, localStorage.timezone.length - 1)
       )},${this.weatherDescription}`;
       const urlImage = `https://api.unsplash.com/photos/random?orientation=landscape&query=${words}&client_id=${this.KEYIMAGEAPI}`;
-      const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${
-        this.MAPOPTIONS.LAT
-      }&lon=${
-        this.MAPOPTIONS.LNG
-      }&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
-        1,
-        2
-      )}&key=${this.KEYCURRENT}`;
-      const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${
-        this.MAPOPTIONS.LAT
-      }&lon=${
-        this.MAPOPTIONS.LNG
-      }&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
-        1,
-        2
-      )}&key=${this.KEYFORECAST}`;
+      const urlCurrent = `https://api.weatherbit.io/v2.0/current?&lat=${this.MAPOPTIONS.LAT
+        }&lon=${this.MAPOPTIONS.LNG
+        }&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
+          1,
+          2
+        )}&key=${this.KEYCURRENT}`;
+      const urlForecast = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${this.MAPOPTIONS.LAT
+        }&lon=${this.MAPOPTIONS.LNG
+        }&days=8&units=${this.getCodeScaleForSearch()}&lang=${localStorage.language.substr(
+          1,
+          2
+        )}&key=${this.KEYFORECAST}`;
       let requests = [fetch(urlCurrent), fetch(urlForecast), fetch(urlImage)];
       const responses = await Promise.all(requests);
       const data = await Promise.all(responses.map((r) => r.json()));
@@ -501,8 +483,7 @@ class App {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
             this.contentFooter.push(
-              `${data.data[index + 1].low_temp}  -  ${
-                data.data[index + 1].high_temp
+              `${data.data[index + 1].low_temp}  -  ${data.data[index + 1].high_temp
               } ${localStorage.scale.substr(1, 2)}`
             );
             this.contentFooter.push(
@@ -525,8 +506,7 @@ class App {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
             this.contentFooter.push(
-              `${data.data[index + 1].low_temp}  -  ${
-                data.data[index + 1].high_temp
+              `${data.data[index + 1].low_temp}  -  ${data.data[index + 1].high_temp
               } ${localStorage.scale.substr(1, 2)}`
             );
             this.contentFooter.push(
@@ -547,8 +527,7 @@ class App {
           if (index < days.length - 1) {
             this.contentFooter.push(`${element}:`);
             this.contentFooter.push(
-              `${data.data[index + 1].low_temp}  -  ${
-                data.data[index + 1].high_temp
+              `${data.data[index + 1].low_temp}  -  ${data.data[index + 1].high_temp
               } ${localStorage.scale.substr(1, 2)}`
             );
             this.contentFooter.push(
@@ -625,14 +604,12 @@ class App {
     try {
       const resLocation = await fetch(urlLocation);
       const dataLocation = await resLocation.json();
-      const urlGeocoding = `https://api.opencagedata.com/geocode/v1/json?q=${
-        dataLocation.city
-      }%20${dataLocation.country}&key=${
-        this.MAPOPTIONS.KEYGEOCORDING
-      }&pretty=1&no_annotations=1&language=${localStorage.language.substr(
-        1,
-        2
-      )}`;
+      const urlGeocoding = `https://api.opencagedata.com/geocode/v1/json?q=${dataLocation.city
+        }%20${dataLocation.country}&key=${this.MAPOPTIONS.KEYGEOCORDING
+        }&pretty=1&no_annotations=1&language=${localStorage.language.substr(
+          1,
+          2
+        )}`;
       const resGeocoding = await fetch(urlGeocoding);
       const dataGeocoding = await resGeocoding.json();
       city = dataGeocoding.results[0].formatted;
@@ -649,12 +626,11 @@ class App {
 
   private async getGeolocationCity(city: string): Promise<string> {
     try {
-      const urlGeocoding = `https://api.opencagedata.com/geocode/v1/json?q=${city}&key=${
-        this.MAPOPTIONS.KEYGEOCORDING
-      }&pretty=1&no_annotations=1&language=${localStorage.language.substr(
-        1,
-        2
-      )}`;
+      const urlGeocoding = `https://api.opencagedata.com/geocode/v1/json?q=${city}&key=${this.MAPOPTIONS.KEYGEOCORDING
+        }&pretty=1&no_annotations=1&language=${localStorage.language.substr(
+          1,
+          2
+        )}`;
       const resGeocoding = await fetch(urlGeocoding);
       const dataGeocoding = await resGeocoding.json();
       city = dataGeocoding.results[0].formatted;
@@ -710,6 +686,7 @@ class App {
 
   private spinnerOff(): void {
     let preloader = document.querySelector('.preloader');
+    console.log(preloader);
     if (!preloader.classList.contains('done')) {
       preloader.classList.add('done');
     }

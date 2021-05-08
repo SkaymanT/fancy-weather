@@ -4,26 +4,14 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
-const babelOptions = (preset) => {
-  const opts = {
-    presets: ['@babel/preset-env'],
-    plugins: ['@babel/plugin-proposal-class-properties'],
-  };
-
-  if (preset) {
-    opts.presets.push(preset);
-  }
-
-  return opts;
-};
-
 module.exports = (env, options) => {
   const isProduction = options.mode === 'production';
   const config = {
     mode: isProduction ? 'production' : 'development',
     devtool: isProduction ? false : 'source-map',
+    target: isProduction ? 'browserslist' : 'web',
     entry: {
-      app: './src/app/app.ts',
+      app: ['./src/style/index.scss', './src/app/index.ts'],
     },
     output: {
       filename: '[name].js',
@@ -55,16 +43,25 @@ module.exports = (env, options) => {
         },
         {
           test: /\.s[ac]ss$/i,
-          use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+          use: [
+            MiniCssExtractPlugin.loader,
+            'css-loader?url=false',
+            {
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: [['postcss-preset-env', {}]],
+                },
+              },
+            },
+            'sass-loader',
+          ],
         },
         {
           test: /\.(png|svg|jpe?g|gif)$/i,
           use: [
             {
               loader: 'file-loader',
-              options: {
-                name: 'img/[name].[ext]',
-              },
             },
           ],
         },
@@ -77,23 +74,25 @@ module.exports = (env, options) => {
 
     devServer: {
       contentBase: path.join(__dirname, 'dist'),
-      compress: true,
       port: 9000,
+      hot: true,
+      historyApiFallback: true,
     },
 
     plugins: [
       new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
-        template: './src/index.html',
+        template: __dirname + '/src/index.html',
+        filename: 'index.html',
+        minify: isProduction,
+        chunks: ['app'],
       }),
       new CopyPlugin({
-        patterns: [{ from: './src/assets/img', to: './assets/img' }],
-      }),
-      new CopyPlugin({
-        patterns: [{ from: './src/assets/icon', to: './assets/icon' }],
+        patterns: [{ from: './src/assets', to: './assets' }],
       }),
       new MiniCssExtractPlugin({
-        filename: 'style.css',
+        filename: '[name].css',
+        chunkFilename: '[id].css',
       }),
     ],
   };
