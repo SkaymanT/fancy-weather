@@ -164,7 +164,6 @@ export default class App {
       localStorage.language.substr(1, 2)
     );
     this.root.append(getFooter(this.contentFooter));
-    console.log("preloader");
     await this.doChangeBackground();
     this.spinnerOff();
   }
@@ -686,7 +685,6 @@ export default class App {
 
   private spinnerOff(): void {
     let preloader = document.querySelector('.preloader');
-    console.log(preloader);
     if (!preloader.classList.contains('done')) {
       preloader.classList.add('done');
     }
