@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack NODE_ENV=development",
-    "build": "webpack NODE_ENV=production",
+    "start": "cross-env NODE_ENV=development webpack",
+    "build": "cross-env NODE_ENV=production webpack",
     "style": "sass --watch src/style/style.scss build/style.css",
     "dev": "webpack serve",
     "lint": "jest",
@@ -68,6 +68,7 @@
     "@types/copy-webpack-plugin": "^8.0.0",
     "@types/mini-css-extract-plugin": "^1.4.3",
     "@types/webpack-dev-server": "^3.11.4",
+    "cross-env": "^7.0.3",
     "mdbootstrap": "^4.19.2",
     "ts-node": "^9.1.1"
   },

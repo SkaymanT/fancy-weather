@@ -87,7 +87,6 @@ const config: Configuration = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: __dirname + '/src/index.html',
-      filename: 'index.html',
       minify: isProduction,
       chunks: ['app'],
     }),
