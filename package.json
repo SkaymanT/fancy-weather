@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --mode development",
-    "build": "webpack --mode production",
-    "style": "sass --watch src/style/style.scss dist/style.css",
+    "start": "webpack NODE_ENV=development",
+    "build": "webpack NODE_ENV=production",
+    "style": "sass --watch src/style/style.scss build/style.css",
     "dev": "webpack serve",
     "lint": "jest",
     "test-watch": "jest --watch"
@@ -65,7 +65,11 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.14.0",
-    "mdbootstrap": "^4.19.2"
+    "@types/copy-webpack-plugin": "^8.0.0",
+    "@types/mini-css-extract-plugin": "^1.4.3",
+    "@types/webpack-dev-server": "^3.11.4",
+    "mdbootstrap": "^4.19.2",
+    "ts-node": "^9.1.1"
   },
   "jest": {
     "transform": {
